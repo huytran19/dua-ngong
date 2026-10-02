@@ -10,28 +10,26 @@
 <meta property="og:image" content="https://huytran19.github.io/dua-ngong/og/home.jpg">
 <meta property="og:url" content="https://huytran19.github.io/dua-ngong/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#8CC152">
+<meta name="theme-color" content="#141A10">
+<script>/* đặt giao diện trước khi vẽ trang, để không chớp sáng */try{if(localStorage.getItem("dua-ngong-theme")==="light")document.documentElement.dataset.theme="light";}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+/* Mặc định tối; data-theme="light" (nút ☀️ trên thanh trên, lưu ở dua-ngong-theme) thì sáng */
 :root{
-  --bg:#EEF4E2; --ink:#1F2A16; --muted:#5C6B4E; --card:#FFFFFF; --line:#C9D8B4;
-  --grass-a:#8CC152; --grass-b:#7DB344; --btn:#1F2A16; --btn-ink:#FFFFFF; --accent:#F29A2E;
+  --bg:#141A10; --ink:#EEF4E2; --muted:#A8B79A; --card:#1E2618; --line:#34422A;
+  --grass-a:#4E7A2A; --grass-b:#446D24; --btn:#F29A2E; --btn-ink:#141A10; --accent:#F29A2E; --frame:#5E7D44;
   --red:#E4572E; --blue:#2E86DE;
+  color-scheme:dark;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#141A10; --ink:#EEF4E2; --muted:#A8B79A; --card:#1E2618; --line:#34422A;
-    --grass-a:#4E7A2A; --grass-b:#446D24; --btn:#F29A2E; --btn-ink:#141A10;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#141A10; --ink:#EEF4E2; --muted:#A8B79A; --card:#1E2618; --line:#34422A;
-  --grass-a:#4E7A2A; --grass-b:#446D24; --btn:#F29A2E; --btn-ink:#141A10;
+:root[data-theme="light"]{
+  --bg:#EEF4E2; --ink:#1F2A16; --muted:#5C6B4E; --card:#FFFFFF; --line:#C9D8B4;
+  --grass-a:#8CC152; --grass-b:#7DB344; --btn:#1F2A16; --btn-ink:#FFFFFF; --frame:#1F2A16;
+  color-scheme:light;
 }
 *,*::before,*::after{box-sizing:inherit}
 html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -44,7 +42,7 @@ section[hidden],[hidden]{display:none!important}
 .stack{display:flex;flex-direction:column;gap:14px}
 
 .top{display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:8px;font-family:"Baloo 2",sans-serif;font-weight:800;font-size:22px}
+.logo{display:flex;align-items:center;gap:8px;min-width:0;white-space:nowrap;font-family:"Baloo 2",sans-serif;font-weight:800;font-size:22px}
 .logo .spr{width:40px;height:32px}
 .icon-btn{appearance:none;border:1px solid var(--line);background:var(--card);border-radius:12px;width:42px;height:42px;font-size:18px}
 
@@ -98,7 +96,7 @@ select{font:inherit;font-size:15px;padding:9px 6px;border:2px solid var(--line);
 .mini{position:relative;height:22px;background:var(--card);border:2px solid var(--line);border-radius:999px}
 .mini i{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;margin:-5.5px 0 0 -5.5px;border:1.5px solid #1b1b1b}
 .mini b{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:13px}
-.track-wrap{position:relative;overflow:hidden;border:3px solid var(--ink);border-radius:16px;background:var(--grass-a)}
+.track-wrap{position:relative;overflow:hidden;border:3px solid var(--frame);border-radius:16px;background:var(--grass-a)}
 .world{position:absolute;left:0;top:0;will-change:transform}
 .lane{position:absolute;left:0;right:0}
 .lane.a{background:var(--grass-a)} .lane.b{background:var(--grass-b)}
@@ -115,7 +113,7 @@ select{font:inherit;font-size:15px;padding:9px 6px;border:2px solid var(--line);
 .status{margin:0;font-size:15px;color:var(--muted);min-height:1.5em;text-align:center}
 
 /* Team field */
-.pasture{position:relative;overflow:hidden;border:3px solid var(--ink);border-radius:16px;
+.pasture{position:relative;overflow:hidden;border:3px solid var(--frame);border-radius:16px;
   background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.08) 0 2px,transparent 3px) 0 0/28px 28px,var(--grass-a)}
 .gate{position:absolute;top:10px;height:76px;border:5px solid #8B5A2B;border-bottom:0;border-radius:10px 10px 0 0;background:rgba(0,0,0,.14);z-index:1}
 .gate::before,.gate::after{content:"";position:absolute;bottom:0;height:5px;width:34%;background:#8B5A2B}
@@ -134,7 +132,7 @@ select{font:inherit;font-size:15px;padding:9px 6px;border:2px solid var(--line);
 .team ol:empty::after{content:"Chưa có ai";color:var(--muted);margin-left:-20px}
 
 /* Giveaway result */
-.winner{background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:22px 18px 18px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.winner{background:var(--card);border:3px solid var(--frame);border-radius:20px;padding:22px 18px 18px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
 .winner .g{position:relative;width:160px;height:128px;animation:bounce 1s ease-in-out infinite alternate}
 .winner .g .spr{width:100%;height:100%}
 .winner .g .badge{font-size:14px;height:22px;line-height:19px;min-width:24px;left:10%}
@@ -172,7 +170,7 @@ select{font:inherit;font-size:15px;padding:9px 6px;border:2px solid var(--line);
 .sub2{margin:0;font-size:14px;font-weight:700;color:var(--muted)}
 
 /* Eggs */
-.nest{position:relative;border:3px solid var(--ink);border-radius:16px;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.08) 0 2px,transparent 3px) 0 0/28px 28px,var(--grass-a);padding:16px 10px 18px;display:grid;gap:12px 6px;grid-template-columns:repeat(var(--cols,3),1fr);overflow:hidden}
+.nest{position:relative;border:3px solid var(--frame);border-radius:16px;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.08) 0 2px,transparent 3px) 0 0/28px 28px,var(--grass-a);padding:16px 10px 18px;display:grid;gap:12px 6px;grid-template-columns:repeat(var(--cols,3),1fr);overflow:hidden}
 .eggcell{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
 .egg{position:relative;width:74%;aspect-ratio:4/5;transform-origin:50% 90%}
 .shell{position:absolute;inset:0;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(circle at 34% 26%,#fff 0 10%,#F7F0E1 42%,#E2D3B4 100%);border:2px solid rgba(40,30,10,.35)}
@@ -200,7 +198,7 @@ select{font:inherit;font-size:15px;padding:9px 6px;border:2px solid var(--line);
 
 /* Ring (Ai bao + Vòng quay) */
 .ring{position:relative;width:100%;max-width:420px;aspect-ratio:1;margin:0 auto}
-.ring.pay{border-radius:50%;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.08) 0 2px,transparent 3px) 0 0/28px 28px,var(--grass-a);border:3px solid var(--ink)}
+.ring.pay{border-radius:50%;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.08) 0 2px,transparent 3px) 0 0/28px 28px,var(--grass-a);border:3px solid var(--frame)}
 .ring svg.wheel{position:absolute;inset:0;width:100%;height:100%}
 .ring svg.wheel text{font-family:"Be Vietnam Pro",sans-serif;font-weight:700;fill:#1b1b1b}
 .ring svg.wheel path.seg{transition:filter .15s}
@@ -254,6 +252,8 @@ textarea.flash{animation:taflash .5s ease-out}
 .top-btns{display:flex;gap:8px}
 .top-left{display:flex;align-items:center;gap:10px;min-width:0}
 #backBtn{font-size:22px;font-weight:700;line-height:1}
+.in-game #logoGoose{display:none} /* có nút ← thì bỏ hình logo cho tên dài khỏi xuống dòng */
+#appTitle{overflow:hidden;text-overflow:ellipsis}
 .hist-title{margin:0;font-family:"Baloo 2",sans-serif;font-weight:800;font-size:30px}
 .hist{display:flex;flex-direction:column;gap:8px}
 .hist-item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
@@ -270,7 +270,7 @@ textarea.flash{animation:taflash .5s ease-out}
   <div class="top">
     <div class="top-left"><button class="icon-btn" id="backBtn" aria-label="Quay lại" hidden>←</button>
       <div class="logo"><span id="logoGoose"></span><span id="appTitle">Đua Ngỗng</span></div></div>
-    <div class="top-btns"><button class="icon-btn" id="histBtn" aria-label="Lịch sử các ván">📜</button><button class="icon-btn" id="mute" aria-label="Tắt tiếng">🔊</button></div>
+    <div class="top-btns"><button class="icon-btn" id="themeBtn" aria-label="Chuyển sang giao diện sáng">☀️</button><button class="icon-btn" id="histBtn" aria-label="Lịch sử các ván">📜</button><button class="icon-btn" id="mute" aria-label="Tắt tiếng">🔊</button></div>
   </div>
 
   <section id="screen-setup" class="stack">
@@ -437,7 +437,7 @@ textarea.flash{animation:taflash .5s ease-out}
   // Rời màn chuẩn bị thì đẩy một mốc vào lịch sử trình duyệt, để nút back của điện thoại quay về thay vì thoát trang
   const show=s=>{
     Object.values(scr).forEach(x=>x.hidden=(x!==s));window.scrollTo(0,0);
-    $("backBtn").hidden=s===scr.setup;
+    $("backBtn").hidden=s===scr.setup; document.body.classList.toggle("in-game",s!==scr.setup);
     if(s!==scr.setup&&!(history.state&&history.state.dn)) try{history.pushState({dn:1},"");}catch(e){}
   };
   const gooseSize=n=>n<=8?48:n<=16?40:n<=28?32:27;
@@ -578,6 +578,19 @@ textarea.flash{animation:taflash .5s ease-out}
   /* ---------- Sound ---------- */
   let muted=false, actx=null;
   $("mute").addEventListener("click",()=>{muted=!muted;$("mute").textContent=muted?"🔇":"🔊";$("mute").setAttribute("aria-label",muted?"Bật tiếng":"Tắt tiếng");});
+  /* ---------- Giao diện sáng/tối ---------- */
+  function applyTheme(light){
+    const root=document.documentElement;
+    if(light) root.dataset.theme="light"; else delete root.dataset.theme;
+    $("themeBtn").textContent=light?"🌙":"☀️";
+    $("themeBtn").setAttribute("aria-label",light?"Chuyển sang giao diện tối":"Chuyển sang giao diện sáng");
+    document.querySelector('meta[name="theme-color"]').content=light?"#EEF4E2":"#141A10";
+  }
+  applyTheme(document.documentElement.dataset.theme==="light");
+  $("themeBtn").addEventListener("click",()=>{
+    const light=document.documentElement.dataset.theme!=="light";
+    applyTheme(light); store.set("dua-ngong-theme",light?"light":"dark");
+  });
   function audio(){actx=actx||new (window.AudioContext||window.webkitAudioContext)();return actx;}
   function honk(pitch=1,delay=0,vol=.35){
     if(muted) return;

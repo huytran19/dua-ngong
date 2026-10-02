@@ -3,7 +3,7 @@
 Game bốc thăm/giveaway chạy trên trình duyệt, dùng cho guild. Toàn bộ nằm trong **một file `index.html`** (HTML + CSS + JS + sprite nhúng base64), không cần build, không phụ thuộc thư viện. Mở trực tiếp bằng trình duyệt là chạy.
 
 ## Cấu trúc trong index.html
-- `<style>`: CSS. Màu theo token trên `:root`, có dark mode qua `prefers-color-scheme` và `data-theme`.
+- `<style>`: CSS. Màu theo token trên `:root`. **Mặc định giao diện tối** (không theo cài đặt máy); nút ☀️/🌙 trên thanh trên đặt `data-theme="light"` trên `<html>`, lưu ở `dua-ngong-theme`. Một script nhỏ trong `<head>` đặt giao diện trước khi vẽ để không chớp sáng. Viền sân chơi và khung người thắng dùng token `--frame`.
 - `<script>`: một IIFE, chia theo khối comment:
   - **core**: hằng số, RNG, sprite engine, tô màu, thoại (`LINES`, `line()`, `say()`), âm thanh (`honk`, `blip`), `countdown`, `loop`.
   - **Setup**: `MODE_INFO`, tên gọi theo đàn thú (`noun()`, `Noun()`), các tuỳ chọn, cặp dính/cấm, nút xáo tên, `go()`, `solveTeams()`.
