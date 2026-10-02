@@ -42,7 +42,10 @@ Game bốc thăm/giveaway chạy trên trình duyệt, dùng cho guild. Toàn b�
 - Tách phần `<script>` ra rồi `node --check` để bắt lỗi cú pháp.
 - Chạy thử từng mode bằng Playwright (viewport 390x844) và chụp màn hình. Máy này không cài Playwright: import từ bản cache `~/.npm/_npx/*/node_modules/playwright/index.mjs` và truyền `executablePath` tới Chromium có sẵn trong `~/Library/Caches/ms-playwright/chromium_headless_shell-*/` (bản đúng phiên bản có thể chưa tải).
 
+## Deploy
+- Repo public `huytran19/dua-ngong`, GitHub Pages từ branch `main`, thư mục root: https://huytran19.github.io/dua-ngong/
+- Push lên `main` là Pages tự build lại (khoảng 1 phút).
+
 ## Việc tiếp theo đã bàn
-- Push lên GitHub và bật GitHub Pages (branch main, thư mục root).
 - Nút gửi kết quả lên Discord qua Webhook (URL webhook chỉ lưu localStorage trên máy host, không ghi vào code). Chỉ chạy được trên bản GitHub Pages.
 - Có thể làm sau: Discord Activity, vé nhiều suất.
