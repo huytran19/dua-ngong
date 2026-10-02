@@ -15,7 +15,8 @@ Game bốc thăm/giveaway chạy trên trình duyệt, dùng cho guild. Toàn b�
 Thứ tự nút trên màn chuẩn bị: Đua Ngỗng, Vòng quay may mắn, Chia team, Sinh tồn, Trứng nở, Giải đấu. Mã mode trong code vẫn giữ tên cũ (`give`, `pass`).
 - **give** (hiển thị: "Đua Ngỗng"): đua ngang, camera bám con dẫn đầu, 3 độ dài 15/30/50s.
 - **team**: 2/3/4 đội đều sĩ số; cặp "dính" (union-find) và "không chung chuồng"; giải bằng quay lui có trọng số trong `solveTeams`. Tốc độ Nhanh/Vừa/Lề mề có giờ tối đa 15/30/60s (gần hết giờ thì hết lưỡng lự, chạm mốc thì lùa thẳng vào chuồng).
-- **survive**: mỗi lần loại bốc đều 1 con còn sống, nên ai cũng 1/n.
+- **survive**: đánh nhau bằng vũ khí. Mỗi con một thanh máu (lượng máu `hpMax` chỉnh theo số con và thời lượng; sát thương giữ đúng min–max ghi trên vũ khí). 8 vũ khí trong `WEAPONS` (khai báo cạnh `MODE_INFO` vì màn chuẩn bị hiện bảng vũ khí): 6 cận chiến, 2 đánh xa bắn đạn bám mục tiêu. Chí mạng 10% x2, né 7%. Bị đánh thì 60% quay sang đánh lại kẻ đó. Tim ❤️ rơi hồi 25% máu. Bo thu từ 40% thời lượng, hết giờ thu về 0 và ngoài bo mất máu gấp đôi, nên trận xong trong khoảng thời lượng đã chọn. Kết quả ghi số hạ gục và vũ khí.
+  - Công bằng: vị trí, vũ khí (chia đều rồi xáo, ít con thì bốc ngẫu nhiên vài món), mục tiêu và thứ tự xử lý mỗi khung hình đều ngẫu nhiên, nên trước trận ai cũng như nhau. Đã cân vũ khí bằng mô phỏng tua nhanh (thay `requestAnimationFrame`/`setTimeout`/`performance.now` bằng đồng hồ giả trong Playwright): 160 trận 8 con, mỗi món thắng 13–24 (kỳ vọng 20), mỗi người 15–26. Sửa chỉ số vũ khí thì nên mô phỏng lại.
 - **egg**: trứng nứt dần, mẹ ấp quả nào thì quả đó ấm hơn.
 - **pass** (hiển thị: "Vòng quay may mắn", trước đây là "Tranh Pass"): nhấn giữ lệnh bài lấy đà. Người thắng **bốc lúc thả tay**; lực chỉ quyết định số vòng (nhẹ 7–9, mạnh nhất 15–17). Dưới 15 người: ghế quanh sân; 15–40 người: vòng chia lát. Tên giải tuỳ chỉnh (mặc định "Battle Pass"), có tuỳ chọn né người vừa thắng.
 

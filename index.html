@@ -167,6 +167,25 @@ select{font:inherit;font-size:15px;padding:9px 6px;border:2px solid var(--line);
 
 /* Survival */
 .mode-arena .gname{left:50%;top:100%;transform:translateX(-50%);font-size:11px;max-width:92px;margin-top:-3px}
+.hpb{position:absolute;left:18%;right:18%;top:-8px;height:5px;background:rgba(0,0,0,.5);border-radius:3px;overflow:hidden;z-index:2}
+.hpb i{display:block;height:100%;width:100%;background:#6AB04C;transition:width .15s,background .15s}
+.wpn{position:absolute;left:72%;top:22%;z-index:2;line-height:1;pointer-events:none}
+.goose.fl .wpn{left:auto;right:72%;scale:-1 1}
+.wpn i{display:block;font-style:normal;transform-origin:25% 85%}
+.wpn i.swing{animation:swing .25s ease-out}
+@keyframes swing{0%{transform:rotate(-70deg)}55%{transform:rotate(45deg)}100%{transform:rotate(0)}}
+.goose.hurt .spr{filter:brightness(1.6) sepia(1) saturate(6) hue-rotate(-40deg)}
+.dmg{position:absolute;z-index:6;transform:translate(-50%,0);font-weight:800;font-size:14px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8),0 0 3px rgba(0,0,0,.5);pointer-events:none;white-space:nowrap;animation:dmgup .9s ease-out forwards}
+.dmg.crit{font-size:19px;color:#FFD23F}
+.dmg.miss{color:#BFD7FF;font-size:12px}
+.dmg.heal{color:#7DFF8A}
+@keyframes dmgup{0%{opacity:0;margin-top:4px}15%{opacity:1}100%{opacity:0;margin-top:-34px}}
+.shot{position:absolute;left:0;top:0;z-index:5;font-size:16px;line-height:1;margin:-8px 0 0 -8px;pointer-events:none}
+.heart{position:absolute;z-index:2;font-size:18px;transform:translate(-50%,-70%);animation:heartbob 1s ease-in-out infinite alternate;pointer-events:none}
+@keyframes heartbob{from{margin-top:0}to{margin-top:-5px}}
+.zone{position:absolute;border-radius:50%;pointer-events:none;z-index:1;border:3px dashed transparent;transition:border-color .3s}
+.zone.on{border-color:rgba(255,90,70,.9);box-shadow:0 0 0 9999px rgba(200,30,20,.22)}
+@media (prefers-reduced-motion: reduce){.dmg{animation-duration:.01s}.heart{animation:none}}
 .goose.out{transition:transform .9s cubic-bezier(.2,.7,.3,1),opacity .9s ease-in;opacity:0}
 .outs{display:flex;flex-wrap:wrap;gap:6px}
 .outs span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px;color:var(--muted);text-decoration:line-through}
@@ -378,6 +397,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
         <button data-dur="30">Vừa ~30s</button>
         <button data-dur="50">Dài ~50s</button>
       </div>
+      <p class="hint" id="survHint" hidden></p>
     </div>
 
     <div id="teamOpts" class="stack" style="gap:8px">
@@ -777,10 +797,23 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
   const Noun=()=>noun().split(" ").map(w=>w[0].toUpperCase()+w.slice(1)).join(" ");
   const momName=()=>herd==="mix"?"Ngỗng mẹ":`${Noun()} mẹ`;
   const prizeName=()=>($("prize").value.trim()||"Battle Pass");
+  // Vũ khí mode Sinh tồn (để ở đây vì màn chuẩn bị hiện bảng vũ khí ngay lúc mở trang)
+  const WEAPONS=[
+    {id:"dagger",ic:"🗡️",name:"Dao găm",min:7,max:13,cd:.65},
+    {id:"sword",ic:"⚔️",name:"Kiếm",min:11,max:19,cd:1},
+    {id:"axe",ic:"🪓",name:"Rìu",min:15,max:27,cd:1.4},
+    {id:"hammer",ic:"🔨",name:"Búa tạ",min:6,max:36,cd:1.4},
+    {id:"pan",ic:"🍳",name:"Chảo",min:9,max:15,cd:.8},
+    {id:"bone",ic:"🦴",name:"Xương",min:8,max:16,cd:.8},
+    {id:"bow",ic:"🏹",name:"Cung",min:5,max:11,cd:.9,ranged:true,shot:"➶"},
+    {id:"wand",ic:"🪄",name:"Đũa phép",min:4,max:17,cd:1.1,ranged:true,shot:"✨"}
+  ];
+  const CRIT=.1, DODGE=.07;
+  const weaponHint=()=>"Vũ khí: "+WEAPONS.map(w=>`${w.ic} ${w.name} ${w.min}–${w.max}${w.ranged?" (xa)":""}`).join(" · ")+`. Chí mạng ${Math.round(CRIT*100)}% gấp đôi, né ${Math.round(DODGE*100)}%.`;
   const MODE_INFO={
     give:{h:()=>`Con ${noun()} nào về nhất, người đó thắng.`,lede:()=>`Mỗi người một con ${noun()}, chạy hoàn toàn ngẫu nhiên trên đường đua dài. Camera bám theo con dẫn đầu cho tới vạch đích.`,go:()=>"Xuất phát",max:40,dur:"Độ dài đường đua"},
     team:{h:()=>`Thả ${noun()}, tự chia đội.`,lede:()=>"Cả đàn xuất phát cùng lúc và tự chạy vào chuồng. Các đội luôn đều nhau, và bạn có thể bắt vài con dính nhau hoặc cấm chung chuồng.",go:()=>`Thả ${noun()}`,max:40},
-    survive:{h:()=>"Con cuối cùng còn đứng là người thắng.",lede:()=>`Cả đàn ${noun()} thả chung một sân, cứ chốc chốc lại có một con bị cắn văng ra ngoài. Con nào trụ lại cuối cùng là người thắng.`,go:()=>"Thả vào sân",max:40,dur:"Thời lượng trận"},
+    survive:{h:()=>"Có vũ khí, chém nhau tới con cuối cùng.",lede:()=>`Mỗi con ${noun()} một thanh máu, được phát ngẫu nhiên một món vũ khí có sát thương tối thiểu–tối đa riêng. Cả đàn lao vào chém nhau, hết máu là văng khỏi sân. Cuối trận bo thu hẹp, ở ngoài bo bị mất máu. Con trụ lại cuối cùng là người thắng.`,go:()=>"Thả vào sân",max:40,dur:"Thời lượng trận"},
     egg:{h:()=>"Trứng ai nở trước, người đó trúng.",lede:()=>`Mỗi người một quả trứng. ${momName()} đi ấp lòng vòng, trứng rung rồi nứt dần. Quả nào nở ra con non đầu tiên là thắng.`,go:()=>"Bắt đầu ấp",max:40,dur:"Thời gian ấp"},
     pass:{h:()=>`Con ${noun()} dừng trước ai, người đó ẵm ${prizeName()}.`,lede:()=>`Cả nhóm xếp vòng quanh ${prizeName()}. Nhấn giữ lệnh bài lấy đà rồi thả, con ${noun()} chạy vòng vòng, chậm dần rồi dừng trước một người. Người đó mang giải về.`,go:()=>`Tranh ${prizeName()}`,max:40},
     cup:{h:()=>"Chia bảng đấu, kéo thả người thắng.",lede:()=>"Tạo bảng nhánh thắng/thua, loại trực tiếp hoặc vòng tròn. Kéo thẻ một đội vào ô Thắng hoặc Thua, đội đó tự đi tiếp đúng nhánh.",go:()=>"Tạo bảng đấu",max:64}
@@ -909,6 +942,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     $("numWrap").hidden=mode==="pass"||mode==="cup";
     $("herdWrap").hidden=$("colorWrap").hidden=mode==="cup";
     $("cupOpts").hidden=mode!=="cup";
+    $("survHint").hidden=mode!=="survive"; if(mode==="survive") $("survHint").textContent=weaponHint();
     document.querySelectorAll("[data-cupfmt]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.cupfmt===cupFmt)));
     document.querySelectorAll("[data-cupbuild]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.cupbuild===cupBuild)));
     document.querySelectorAll("[data-cupsize]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.cupsize===cupSize)));
@@ -1083,7 +1117,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     $("winLabel").textContent=cfg.label; $("winName").textContent=cfg.name;
     addHistory({mode,herd,n:cfg.n||(cfg.order?cfg.order.length:0),winner:cfg.name,prize:mode==="pass"?prizeName():"",top:(cfg.order||[]).slice(1,3).map(r=>r.name)});
     const ol=$("rank"); ol.innerHTML=""; ol.hidden=!cfg.order;
-    (cfg.order||[]).forEach(r=>{const li=document.createElement("li");const sw=document.createElement("span");sw.className="sw";sw.style.background=r.color;li.appendChild(sw);li.appendChild(document.createTextNode(r.name));ol.appendChild(li);});
+    (cfg.order||[]).forEach(r=>{const li=document.createElement("li");const sw=document.createElement("span");sw.className="sw";sw.style.background=r.color;li.appendChild(sw);li.appendChild(document.createTextNode(r.name+(cfg.note?" · "+cfg.note(r):"")));ol.appendChild(li);});
     $("again").textContent=cfg.again;
     $("removeWin").hidden=!cfg.removeText; if(cfg.removeText) $("removeWin").textContent=cfg.removeText;
     show(scr.result);
@@ -1367,6 +1401,10 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
   });
 
   /* ---------- Mode: Sinh tồn ---------- */
+  // Mỗi con 100 máu, phát ngẫu nhiên một vũ khí (sát thương min–max, thời gian hồi đòn, tầm đánh).
+  // Các món được cân để sát thương mỗi giây gần bằng nhau; đánh xa thấp hơn chút vì đứng xa an toàn hơn.
+  // Vị trí, vũ khí, mục tiêu, thứ tự xử lý mỗi khung hình đều xáo ngẫu nhiên nên trước trận ai cũng như nhau.
+  // Cuối trận bo thu hẹp, ở ngoài bo bị trừ máu, để trận xong gần đúng thời lượng đã chọn.
   let A=null;
   function startSurvive(racers){
     const my=++session; show(scr.arena);
@@ -1375,97 +1413,185 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     const n=racers.length, W=host.clientWidth, H=Math.round(clamp(window.innerHeight-260,380,560));
     host.style.height=H+"px";
     const gh=gooseSize(n), gw=gh*1.25;
-    const interval=clamp(dur*.9/(n-1),.7,5);
-    A={my,racers,W,H,gw,gh,alive:n,t:0,next:1.6,interval,attack:null,order:[],running:false,done:false};
+    // sát thương giữ đúng min–max của vũ khí; lượng máu chỉnh theo số con và thời lượng để trận dài ngắn đúng lựa chọn
+    const hpMax=Math.round(clamp(100*(.85*dur)/Math.min(4+1.5*n,17),40,400));
+    const zone=document.createElement("div"); zone.className="zone"; host.appendChild(zone);
+    A={my,racers,W,H,gw,gh,hpMax,alive:n,t:0,order:[],running:false,done:false,shots:[],hearts:[],heartT:between(3,5),
+       zone,zx:W/2,zy:H/2,zR0:Math.hypot(W,H)/2+gw,zR:Math.hypot(W,H)/2+gw,zMin:gw*1.6,feedT:0,blipT:0};
     const cols=Math.ceil(Math.sqrt(n*W/H)), rows=Math.ceil(n/cols);
+    const pool=shuffle(WEAPONS), wpns=shuffle(racers.map((r,i)=>pool[i%pool.length])); // ít con thì bốc ngẫu nhiên vài món, đông thì chia đều rồi xáo
     shuffle(racers).forEach((r,k)=>{
       const cx=(k%cols+.5)*W/cols+between(-8,8), cy=(Math.floor(k/cols)+.5)*(H-gh-20)/rows+gh+10+between(-6,6);
-      Object.assign(r,{x:clamp(cx,gw/2,W-gw/2),y:clamp(cy,gh+4,H-10),h:between(-Math.PI,Math.PI),ht:0,turnT:0,
-        base:between(.8,1.2)*gw*1.5,state:"run",stateT:0,bubbleT:0,out:false});
-      r.ht=r.h;
-      makeGoose(r,()=>!A.running?"idle":r.out?"flap":r.state==="stall"?"idle":r.state==="sprint"?"flap":"walk");
+      Object.assign(r,{x:clamp(cx,gw/2,W-gw/2),y:clamp(cy,gh+4,H-10),h:between(-Math.PI,Math.PI),
+        base:between(.95,1.05)*gw*1.7,state:"run",bubbleT:0,out:false,hp:hpMax,wpn:wpns[k],cool:between(.3,1.2),
+        tgt:null,retT:0,kills:0,hurtT:0,jx:between(-1,1),jy:between(-1,1)});
+      makeGoose(r,()=>!A.running?"idle":r.out?"flap":r.state==="atk"?"flap":r.state==="idle"?"idle":"walk");
       r.el.style.width=gw+"px"; r.el.style.height=gh+"px";
+      const hp=document.createElement("span"); hp.className="hpb"; hp.innerHTML="<i></i>"; r.el.appendChild(hp); r.hpEl=hp.firstChild;
+      const wp=document.createElement("span"); wp.className="wpn"; wp.innerHTML="<i></i>"; wp.firstChild.textContent=r.wpn.ic;
+      wp.style.fontSize=Math.round(gh*.5)+"px"; r.el.appendChild(wp); r.wpnEl=wp;
       host.appendChild(r.el); placeArena(r);
     });
-    $("status3").textContent=`${n} con vào sân. Chuẩn bị…`;
+    placeZone();
+    $("status3").textContent=`${n} con vào sân, vũ khí đã phát. Chuẩn bị…`;
     countdown(host,my,()=>{A.running=true;$("status3").textContent=`Còn ${A.alive} con`;shuffle(racers).slice(0,Math.min(3,racers.length)).forEach(r=>say(r,line(r,"start")));loop(my,tickSurvive);});
   }
   function placeArena(r){
     r.el.style.transform=`translate(${r.x-A.gw/2}px,${r.y-A.gh}px)`;
-    r.spr.style.transform=Math.cos(r.h)<0?"scaleX(-1)":"";
+    const left=Math.cos(r.h)<0;
+    r.spr.style.transform=left?"scaleX(-1)":"";
+    r.el.classList.toggle("fl",left);
+  }
+  function placeZone(){
+    const z=A.zone, R=A.zR;
+    z.style.cssText=`left:${A.zx-R}px;top:${A.zy-R}px;width:${2*R}px;height:${2*R}px`;
+    z.classList.toggle("on",A.zR<A.zR0-1);
+  }
+  function floatText(x,y,text,cls){
+    const d=document.createElement("span"); d.className="dmg "+(cls||""); d.textContent=text;
+    d.style.left=x+"px"; d.style.top=y+"px"; $("arena").appendChild(d);
+    setTimeout(()=>d.remove(),900);
+  }
+  function setHp(r){
+    const p=clamp(r.hp/A.hpMax,0,1); r.hpEl.style.width=(p*100)+"%";
+    r.hpEl.style.background=p>.55?"#6AB04C":p>.25?"#F2C230":"#E4572E";
+  }
+  function hurt(v,dmg,by,crit){
+    v.hp-=dmg; setHp(v); v.hurtT=.18; v.el.classList.add("hurt");
+    if(by&&!by.out&&v.tgt!==by&&rnd()<.6){v.tgt=by; v.retT=between(1.5,3);} // bị đánh thì hay quay sang đánh lại kẻ đó
+    floatText(v.x,v.y-A.gh*1.05,(crit?"💥 ":"")+"-"+dmg,crit?"crit":"");
+    if(A.blipT<=0){blip();A.blipT=.08;}
+    if(v.hp<=0&&A.alive>1) knock(v,by);
+  }
+  function strike(a,v){ // đòn đánh trúng (đạn bay tới cũng gọi hàm này)
+    if(v.out||A.done) return;
+    if(rnd()<DODGE){floatText(v.x,v.y-A.gh*1.05,"Né!","miss"); return;}
+    const w=a.wpn, crit=rnd()<CRIT;
+    const dmg=(w.min+Math.floor(rnd()*(w.max-w.min+1)))*(crit?2:1);
+    // đẩy lùi nhẹ theo hướng đòn
+    const d=Math.hypot(v.x-a.x,v.y-a.y)||1; v.x+=(v.x-a.x)/d*A.gw*(crit?.35:.15); v.y+=(v.y-a.y)/d*A.gw*(crit?.35:.15);
+    if(crit&&rnd()<.5) say(a,["Chí mạng!","Ăn nè!","Cú này đau!","Bùm!"][Math.floor(rnd()*4)],1);
+    hurt(v,dmg,a,crit);
+  }
+  function pickTarget(r,alive){
+    // con gần nhất, thỉnh thoảng đổi ý chọn con khác cho đỡ đoán trước
+    const others=alive.filter(o=>o!==r); if(!others.length) return null;
+    if(rnd()<.25) return pick(others);
+    let best=null,bd=1e9; for(const o of others){const d=Math.hypot(o.x-r.x,o.y-r.y); if(d<bd){bd=d;best=o;}}
+    return best;
   }
   function tickSurvive(dt){
-    A.t+=dt;
-    const alive=A.racers.filter(r=>!r.out);
-    for(const r of alive){
-      tickBubble(r,dt);
-      if(A.attack&&A.attack.a===r){
-        const v=A.attack.v; r.h=Math.atan2(v.y-r.y,v.x-r.x);
-        r.x+=Math.cos(r.h)*r.base*4.2*dt; r.y+=Math.sin(r.h)*r.base*4.2*dt;
-        continue;
-      }
-      r.turnT-=dt; r.stateT-=dt;
-      if(r.turnT<=0){r.ht=r.h+between(-1.6,1.6);r.turnT=between(.5,1.5);}
-      if(r.state!=="run"&&r.stateT<=0) r.state="run";
-      if(r.state==="run"){
-        const roll=rnd();
-        if(roll<.12*dt){r.state="stall";r.stateT=between(.4,1);}
-        else if(roll<.2*dt){r.state="sprint";r.stateT=between(.4,.8);}
-        else if(roll<.28*dt){say(r,line(r,"chat"));}
-      }
-      r.h+=angDiff(r.h,r.ht)*Math.min(1,dt*2);
-      const v=r.base*(r.state==="stall"?0:r.state==="sprint"?2.2:1);
-      r.x+=Math.cos(r.h)*v*dt; r.y+=Math.sin(r.h)*v*dt;
-      if(r.x<A.gw/2||r.x>A.W-A.gw/2){r.h=Math.PI-r.h;r.ht=r.h;}
-      if(r.y<A.gh+4||r.y>A.H-10){r.h=-r.h;r.ht=r.h;}
+    A.t+=dt; A.blipT-=dt; A.feedT-=dt;
+    // bo: thu từ 40% thời lượng, còn nhỏ ở 85%, hết giờ thì thu về 0 (ai cũng ở ngoài, máu tụt nhanh)
+    const zp=clamp((A.t-dur*.4)/(dur*.45),0,1), zEnd=clamp((A.t-dur*.85)/(dur*.15),0,1), late=A.t>dur?2:1;
+    A.zR=(A.zR0+(A.zMin-A.zR0)*zp)*(1-zEnd); placeZone();
+    const alive=shuffle(A.racers.filter(r=>!r.out)); // thứ tự xử lý ngẫu nhiên mỗi khung hình
+    if(A.feedT<=0&&!A.done) $("status3").textContent=zp>0&&zp<1?`Còn ${A.alive} con · ⚠️ Bo đang thu hẹp`:`Còn ${A.alive} con`;
+    // máu rơi
+    A.heartT-=dt;
+    if(A.heartT<=0&&A.hearts.length<3&&!A.done){
+      A.heartT=between(3,6);
+      const ang=rnd()*Math.PI*2, rr=Math.min(A.zR*.7,Math.min(A.W,A.H)*.4)*Math.sqrt(rnd());
+      const hx=clamp(A.zx+Math.cos(ang)*rr,A.gw/2,A.W-A.gw/2), hy=clamp(A.zy+Math.sin(ang)*rr,A.gh+4,A.H-10);
+      const el=document.createElement("span"); el.className="heart"; el.textContent="❤️"; el.style.left=hx+"px"; el.style.top=hy+"px"; $("arena").appendChild(el);
+      A.hearts.push({x:hx,y:hy,el});
     }
-    const minD=A.gw*.6;
-    for(let i=0;i<alive.length;i++)for(let j=i+1;j<alive.length;j++){
-      const a=alive[i],b=alive[j];
-      if(A.attack&&((A.attack.a===a&&A.attack.v===b)||(A.attack.a===b&&A.attack.v===a))) continue;
-      const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||.01;
+    for(const r of alive){
+      if(r.out) continue;
+      tickBubble(r,dt); r.cool-=dt; r.retT-=dt;
+      if(r.hurtT>0){r.hurtT-=dt; if(r.hurtT<=0) r.el.classList.remove("hurt");}
+      if(!r.tgt||r.tgt.out||r.retT<=0){r.tgt=pickTarget(r,alive);r.retT=between(1.5,3);}
+      const w=r.wpn, range=w.ranged?A.gw*2.8:A.gw*.95;
+      let gx=r.x, gy=r.y, want=0;
+      // ngoài bo thì chạy vào trong trước
+      const dz=Math.hypot(r.x-A.zx,r.y-A.zy), outside=dz>A.zR-A.gw*.3;
+      // máu thấp thì đi nhặt tim nếu gần
+      const heart=r.hp<A.hpMax*.45&&A.hearts.find(h=>Math.hypot(h.x-r.x,h.y-r.y)<A.gw*5);
+      if(outside){gx=A.zx;gy=A.zy;want=1.25;}
+      else if(heart){gx=heart.x;gy=heart.y;want=1.1;}
+      else if(r.tgt){
+        const t=r.tgt, d=Math.hypot(t.x-r.x,t.y-r.y);
+        if(d>range*.9){gx=t.x+r.jx*A.gw*.3;gy=t.y+r.jy*A.gw*.3;want=1;}
+        if(d<=range&&r.cool<=0){
+          r.cool=w.cd*between(.9,1.1); r.state="atk"; r.atkT=.25;
+          r.h=Math.atan2(t.y-r.y,t.x-r.x);
+          const i=r.wpnEl.firstChild; i.classList.remove("swing"); void i.offsetWidth; i.classList.add("swing");
+          if(w.ranged){
+            const s=document.createElement("span"); s.className="shot"; s.textContent=w.shot; $("arena").appendChild(s);
+            A.shots.push({a:r,v:t,x:r.x,y:r.y-A.gh*.5,el:s});
+          } else strike(r,t);
+          if(rnd()<.06) say(r,line(r,"attack"));
+          if(A.done) break;
+        }
+      }
+      if(r.atkT>0){r.atkT-=dt; if(r.atkT<=0) r.state="run";}
+      if(want>0){
+        const ang=Math.atan2(gy-r.y,gx-r.x); r.h+=angDiff(r.h,ang)*Math.min(1,dt*8);
+        const v=r.base*want*(r.state==="atk"?.4:1);
+        r.x+=Math.cos(r.h)*v*dt; r.y+=Math.sin(r.h)*v*dt;
+        if(r.state!=="atk") r.state="run";
+      } else if(r.state!=="atk") r.state="idle";
+    }
+    // đạn bay (bám theo mục tiêu)
+    A.shots=A.shots.filter(s=>{
+      const tx=s.v.x, ty=s.v.y-A.gh*.5, d=Math.hypot(tx-s.x,ty-s.y), sp=A.gw*9*dt;
+      if(s.v.out||A.done){s.el.remove();return false;}
+      if(d<=sp){s.el.remove(); strike(s.a,s.v); return false;}
+      s.x+=(tx-s.x)/d*sp; s.y+=(ty-s.y)/d*sp;
+      s.el.style.transform=`translate(${s.x}px,${s.y}px) rotate(${Math.atan2(ty-s.y,tx-s.x)}rad)`;
+      return true;
+    });
+    // ngoài bo bị trừ máu (càng về cuối càng đau)
+    if(zp>0) for(const r of shuffle(A.racers.filter(x=>!x.out))){
+      if(A.done) break;
+      const dz=Math.hypot(r.x-A.zx,r.y-A.zy);
+      if(dz>A.zR){r.zoneAcc=(r.zoneAcc||0)+(.06+.3*zp)*late*A.hpMax*dt; if(r.zoneAcc>=4){const d=Math.floor(r.zoneAcc); r.zoneAcc-=d; hurt(r,d,null,false);}}
+    }
+    // nhặt tim
+    for(const r of A.racers){ if(r.out) continue;
+      const hi=A.hearts.findIndex(h=>Math.hypot(h.x-r.x,h.y-r.y)<A.gw*.6);
+      if(hi>=0){const h=A.hearts.splice(hi,1)[0]; h.el.remove(); const add=Math.min(Math.round(A.hpMax*.25),A.hpMax-r.hp); r.hp+=add; setHp(r); floatText(r.x,r.y-A.gh*1.05,"+"+Math.round(add),"heal");}
+    }
+    // tách nhau ra cho khỏi chồng lên
+    const live=A.racers.filter(r=>!r.out), minD=A.gw*.6;
+    for(let i=0;i<live.length;i++)for(let j=i+1;j<live.length;j++){
+      const a=live[i],b=live[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||.01;
       if(d<minD){const p=(minD-d)/2,ux=dx/d,uy=dy/d;a.x-=ux*p;a.y-=uy*p;b.x+=ux*p;b.y+=uy*p;}
     }
-    for(const r of alive){ r.x=clamp(r.x,A.gw/2,A.W-A.gw/2); r.y=clamp(r.y,A.gh+4,A.H-10); placeArena(r); }
+    for(const r of live){ r.x=clamp(r.x,A.gw/2,A.W-A.gw/2); r.y=clamp(r.y,A.gh+4,A.H-10); placeArena(r); }
 
-    if(A.attack){
-      A.attack.t+=dt;
-      const {a,v}=A.attack;
-      if(Math.hypot(a.x-v.x,a.y-v.y)<A.gw*.7||A.attack.t>1.3) knock(v,a);
-    }else if(A.alive>1&&A.t>=A.next){
-      const v=pick(alive); // nạn nhân bốc đều ngẫu nhiên, nên ai cũng có cơ hội như nhau
-      let a=null, best=1e9;
-      for(const r of alive) if(r!==v){const d=Math.hypot(r.x-v.x,r.y-v.y); if(d<best){best=d;a=r;}}
-      A.attack={a,v,t:0}; a.state="sprint"; say(a,line(a,"attack"));
-    }
     if(A.alive===1&&!A.done){
       A.done=true;
-      const w=A.racers.find(r=>!r.out); w.state="stall"; say(w,line(w,"win"),3);
-      $("status3").textContent=`🏆 ${w.name} trụ lại cuối cùng!`;
+      A.shots.forEach(s=>s.el.remove()); A.shots=[];
+      const w=A.racers.find(r=>!r.out); w.state="idle"; say(w,line(w,"win"),3);
+      $("status3").textContent=`🏆 ${w.name} trụ lại cuối cùng! ${w.wpn.ic} ${w.kills} hạ gục`;
       honk(1.25);honk(1.25,.28);
       setTimeout(()=>{
         if(A.my===session){
           const order=[w].concat(A.order.slice().reverse());
-          showResult({label:"🏆 Sống sót cuối cùng",name:w.name,sp:w.sp,color:w.color,num:showNum?w.num:0,order,again:"Chơi lại",
-            removeText:order.length>2?`Loại "${w.name}", chơi tiếp`:null,copy:rankCopy(`🏆 Sống sót: ${w.name}`,order)});
+          showResult({label:`🏆 Sống sót cuối cùng · ${w.wpn.ic} ${w.wpn.name} · ${w.kills} hạ gục`,name:w.name,sp:w.sp,color:w.color,num:showNum?w.num:0,order,
+            note:r=>`${r.wpn.ic} ${r.kills} hạ gục`,again:"Chơi lại",
+            removeText:order.length>2?`Loại "${w.name}", chơi tiếp`:null,
+            copy:`🏆 Sống sót: ${w.name} (${w.wpn.ic} ${w.wpn.name}, ${w.kills} hạ gục)\n\nThứ tự:\n`+order.map((r,i)=>`${i+1}. ${r.name} · ${r.wpn.ic} ${r.wpn.name} · ${r.kills} hạ gục`).join("\n")});
         }
       },1800);
       return false;
     }
   }
-  function knock(v,a){
-    v.out=true; A.alive--; A.order.push(v); A.attack=null;
-    a.state="run";
-    const ang=Math.atan2(v.y-a.y,v.x-a.x)+between(-.3,.3), far=Math.max(A.W,A.H);
+  function knock(v,by){
+    v.out=true; A.alive--; A.order.push(v); v.killedBy=by;
+    if(by) by.kills++;
+    const from=by||{x:A.zx,y:A.zy};
+    const ang=Math.atan2(v.y-from.y,v.x-from.x)+between(-.3,.3), far=Math.max(A.W,A.H);
     say(v,line(v,"hit"),1.2);
-    v.el.classList.add("out");
+    v.el.classList.remove("hurt"); v.el.classList.add("out");
     v.el.style.transform=`translate(${v.x+Math.cos(ang)*far*.6-A.gw/2}px,${v.y+Math.sin(ang)*far*.6-A.gh}px) rotate(${between(360,720)}deg)`;
     honk(1.5,0,.2);
     $("outTitle").hidden=false;
-    const chip=document.createElement("span"); chip.textContent=v.name; $("outList").prepend(chip);
-    A.next=A.t+(A.alive===2?A.interval*1.6+1:A.interval);
-    if(A.alive===2){const f=A.racers.filter(r=>!r.out);$("status3").textContent=`⚔️ Chung kết: ${f[0].name} và ${f[1].name}`;}
-    else if(A.alive>1) $("status3").textContent=`Còn ${A.alive} con`;
+    const chip=document.createElement("span"); chip.textContent=v.name; chip.title=by?`bị ${by.name} hạ (${by.wpn.name})`:"chết ngoài bo"; $("outList").prepend(chip);
+    $("status3").textContent=by?`${by.wpn.ic} ${by.name} hạ gục ${v.name}!`:`☠️ ${v.name} gục ngoài bo!`;
+    A.feedT=1.4;
+    if(A.alive===2){const f=A.racers.filter(r=>!r.out);$("status3").textContent+=` ⚔️ Chung kết: ${f[0].name} và ${f[1].name}`; A.feedT=2.5;}
   }
 
   /* ---------- Mode: Trứng nở ---------- */
