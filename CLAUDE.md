@@ -36,6 +36,11 @@ Thứ tự nút trên màn chuẩn bị: Đua Ngỗng, Vòng quay may mắn, Chi
 - Không hiển thị seed (người dùng không muốn).
 - Mô phỏng 20.000 ván Đua Ngỗng 10 con: mỗi làn thắng 9,7–10,4%. Mỗi con có "tốc độ gốc" lệch ±4% (`base`), con có base cao nhất thắng ~17,6%. Có thể bỏ độ lệch này nếu muốn kết quả do diễn biến quyết định hoàn toàn.
 
+## Logo
+- Logo Lunar Capital (chim ruồi trong trăng khuyết, màu pastel). Ảnh gốc đã trong suốt nhưng có viền trắng mờ; bản dùng trong game đã bỏ viền trắng đó, cắt sát hình.
+- Nhúng base64 128px vào thanh trên (`.brand`, ẩn khi đang trong ván để tên khỏi xuống dòng) và favicon 64px ngay trong `index.html`. `icons/apple-touch-icon.png` (180px, nền tối) cho icon màn hình chính, `icons/logo-512.png` dùng để ghép ảnh xem trước.
+- Giao diện sáng: logo nhạt trên nền sáng nên đặt trên nền tròn tối.
+
 ## Sprite
 - Nguồn: Duckhive trên itch.io (ngỗng, thỏ, sóc: CC0; cánh cụt: tác giả cho dùng tự do). Đã bỏ bò và ếch vì giống asset của game khác.
 - Sheet 264x432, mỗi ô 40x32 với viền trống 2px (bước 44x36) để chống lem pixel khi phóng to. Mọi con đã lật cho quay mặt sang phải.
