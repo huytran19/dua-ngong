@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Đua Ngỗng</title>
-<meta name="description" content="Game bốc thăm cho guild: Giveaway, Chia team, Sinh tồn, Trứng nở, Tranh Pass. Mở là chơi, không cần cài.">
-<meta property="og:title" content="Đua Thú: bốc thăm cho guild">
-<meta property="og:description" content="Giveaway, Chia team, Sinh tồn, Trứng nở, Tranh Pass. Dán danh sách tên, bấm một nút là có kết quả.">
+<title>Lunar Capital Tool</title>
+<meta name="description" content="Tool bốc thăm của Lunar Capital: Đua Ngỗng, Vòng quay may mắn, Chia team, Sinh tồn, Trứng nở. Mở là chơi, không cần cài.">
+<meta property="og:title" content="Lunar Capital Tool: bốc thăm cho guild">
+<meta property="og:description" content="Đua Ngỗng, Vòng quay may mắn, Chia team, Sinh tồn, Trứng nở. Dán danh sách tên, bấm một nút là có kết quả.">
 <meta property="og:image" content="https://huytran19.github.io/dua-ngong/og/home.jpg">
 <meta property="og:url" content="https://huytran19.github.io/dua-ngong/">
 <meta name="twitter:card" content="summary_large_image">
@@ -92,7 +92,7 @@ select{font:inherit;font-size:15px;padding:9px 6px;border:2px solid var(--line);
 .crown{position:absolute;top:-8px;left:40%;font-size:14px;display:none;z-index:2}
 .goose.lead .crown{display:block}
 
-/* Giveaway track */
+/* Đua Ngỗng (mode give) */
 .mini{position:relative;height:22px;background:var(--card);border:2px solid var(--line);border-radius:999px}
 .mini i{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;margin:-5.5px 0 0 -5.5px;border:1.5px solid #1b1b1b}
 .mini b{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:13px}
@@ -131,7 +131,7 @@ select{font:inherit;font-size:15px;padding:9px 6px;border:2px solid var(--line);
 .team ol{margin:0;padding-left:20px;font-size:14px;line-height:1.6;word-break:break-word}
 .team ol:empty::after{content:"Chưa có ai";color:var(--muted);margin-left:-20px}
 
-/* Giveaway result */
+/* Màn kết quả */
 .winner{background:var(--card);border:3px solid var(--frame);border-radius:20px;padding:22px 18px 18px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
 .winner .g{position:relative;width:160px;height:128px;animation:bounce 1s ease-in-out infinite alternate}
 .winner .g .spr{width:100%;height:100%}
@@ -151,7 +151,7 @@ select{font:inherit;font-size:15px;padding:9px 6px;border:2px solid var(--line);
 
 /* Mode picker */
 .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.modes button{appearance:none;border:2px solid var(--line);background:var(--card);border-radius:14px;padding:9px 4px 8px;font-weight:700;font-size:13px;line-height:1.2;display:flex;flex-direction:column;align-items:center;gap:3px}
+.modes button{text-wrap:balance;appearance:none;border:2px solid var(--line);background:var(--card);border-radius:14px;padding:9px 4px 8px;font-weight:700;font-size:13px;line-height:1.2;display:flex;flex-direction:column;align-items:center;gap:3px}
 .modes button span{font-size:22px;line-height:1}
 .modes button[aria-pressed="true"]{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
 .gate.bottom{top:auto;bottom:10px;border:5px solid #8B5A2B;border-top:0;border-radius:0 0 10px 10px}
@@ -253,7 +253,7 @@ textarea.flash{animation:taflash .5s ease-out}
 .top-left{display:flex;align-items:center;gap:10px;min-width:0}
 #backBtn{font-size:22px;font-weight:700;line-height:1}
 .in-game #logoGoose{display:none} /* có nút ← thì bỏ hình logo cho tên dài khỏi xuống dòng */
-#appTitle{overflow:hidden;text-overflow:ellipsis}
+#appTitle{overflow:hidden;text-overflow:ellipsis;font-size:clamp(16px,4.6vw,22px)}
 .hist-title{margin:0;font-family:"Baloo 2",sans-serif;font-weight:800;font-size:30px}
 .hist{display:flex;flex-direction:column;gap:8px}
 .hist-item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
@@ -269,17 +269,17 @@ textarea.flash{animation:taflash .5s ease-out}
 <main class="app">
   <div class="top">
     <div class="top-left"><button class="icon-btn" id="backBtn" aria-label="Quay lại" hidden>←</button>
-      <div class="logo"><span id="logoGoose"></span><span id="appTitle">Đua Ngỗng</span></div></div>
+      <div class="logo"><span id="logoGoose"></span><span id="appTitle">Lunar Capital Tool</span></div></div>
     <div class="top-btns"><button class="icon-btn" id="themeBtn" aria-label="Chuyển sang giao diện sáng">☀️</button><button class="icon-btn" id="histBtn" aria-label="Lịch sử các ván">📜</button><button class="icon-btn" id="mute" aria-label="Tắt tiếng">🔊</button></div>
   </div>
 
   <section id="screen-setup" class="stack">
     <div class="modes" role="group" aria-label="Chế độ">
-      <button data-mode="give"><span>🎁</span>Giveaway</button>
+      <button data-mode="give"><span>🎁</span>Đua Ngỗng</button>
+      <button data-mode="pass"><span>🎟️</span>Vòng quay may mắn</button>
       <button data-mode="team"><span>⚔️</span>Chia team</button>
       <button data-mode="survive"><span>💥</span>Sinh tồn</button>
       <button data-mode="egg"><span>🥚</span>Trứng nở</button>
-      <button data-mode="pass"><span>🎟️</span>Tranh Pass</button>
     </div>
     <h1 id="headline"></h1>
     <p class="lede" id="lede"></p>
@@ -635,7 +635,7 @@ textarea.flash{animation:taflash .5s ease-out}
   }
 
   /* ---------- Setup ---------- */
-  // Tên gọi thay theo đàn thú đang chọn: Đua Ngỗng, Đua Thỏ, ... hoặc Đua Thú khi trộn
+  // Tên gọi thay theo đàn thú đang chọn (ngỗng, thỏ, ... hoặc thú khi trộn), dùng trong lời dẫn và nút
   const NOUN={goose:"ngỗng",bunny:"thỏ",squirrel:"sóc",penguin:"cánh cụt",mix:"thú"};
   const noun=()=>NOUN[herd]||"thú";
   const Noun=()=>noun().split(" ").map(w=>w[0].toUpperCase()+w.slice(1)).join(" ");
@@ -751,8 +751,7 @@ textarea.flash{animation:taflash .5s ease-out}
     else put(herd);
   }
   function applyText(){
-    const info=MODE_INFO[mode], title=`Đua ${Noun()}`;
-    $("appTitle").textContent=title; document.title=title;
+    const info=MODE_INFO[mode];
     $("headline").textContent=info.h(); $("lede").textContent=info.lede(); $("go").textContent=info.go();
     $("numLabel").textContent=`Hiện số trên ${noun()}`;
   }
@@ -881,7 +880,7 @@ textarea.flash{animation:taflash .5s ease-out}
 
   /* ---------- Lịch sử các ván ---------- */
   const HIST_KEY="dua-ngong-history", HIST_MAX=100;
-  const MODE_LABEL={give:"🎁 Giveaway",team:"⚔️ Chia team",survive:"💥 Sinh tồn",egg:"🥚 Trứng nở",pass:"🎟️ Tranh Pass"};
+  const MODE_LABEL={give:"🎁 Đua Ngỗng",team:"⚔️ Chia team",survive:"💥 Sinh tồn",egg:"🥚 Trứng nở",pass:"🎟️ Vòng quay may mắn"};
   function loadHistory(){try{const h=JSON.parse(store.get(HIST_KEY,"[]"));return Array.isArray(h)?h:[];}catch(e){return [];}}
   function addHistory(e){const h=loadHistory();h.unshift({t:Date.now(),...e});store.set(HIST_KEY,JSON.stringify(h.slice(0,HIST_MAX)));}
   const fmtTime=t=>{const d=new Date(t),p=x=>String(x).padStart(2,"0");return `${p(d.getHours())}:${p(d.getMinutes())} ${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()}`;};
@@ -952,7 +951,7 @@ textarea.flash{animation:taflash .5s ease-out}
   });
   const rankCopy=(title,order)=>title+"\n\nThứ tự:\n"+order.map((r,i)=>`${i+1}. ${r.name}`).join("\n");
 
-  /* ---------- Mode: Giveaway ---------- */
+  /* ---------- Mode: Đua Ngỗng (give) ---------- */
   let G=null;
   function startGive(racers){
     const my=++session; show(scr.race);
@@ -1412,7 +1411,7 @@ textarea.flash{animation:taflash .5s ease-out}
     }
   }
 
-  /* ---------- Mode: Tranh Pass ---------- */
+  /* ---------- Mode: Vòng quay may mắn (pass) ---------- */
   // Lệnh bài vẽ riêng (hình gỗ có móc treo, huy hiệu vàng đơn giản)
   const TOKEN_SVG=`<svg viewBox="0 0 100 140" aria-hidden="true">
     <circle cx="50" cy="10" r="7" fill="none" stroke="#6B4220" stroke-width="4"/>
