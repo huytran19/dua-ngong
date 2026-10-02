@@ -301,6 +301,9 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
 .tcard .tn,.tcard small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tcard small{font-size:.78em;font-weight:500;color:var(--muted)}
 .tcard .crown{margin-left:auto;flex:none}
+.wbtn{appearance:none;flex:none;align-self:center;margin:0 4px 0 2px;border:1.5px solid var(--line);background:transparent;color:var(--muted);border-radius:7px;padding:3px 7px;font:inherit;font-size:calc(var(--fs) * .76);font-weight:800;line-height:1.1;cursor:pointer;white-space:nowrap}
+.wbtn:hover{border-color:#6AB04C;color:#8FD06E}
+.slot.win .wbtn{background:#6AB04C;border-color:#6AB04C;color:#10200C}
 .tcard.picked{outline:3px solid var(--accent);background:rgba(242,154,46,.18)}
 .tcard.ghost{position:fixed;left:0;top:0;z-index:60;pointer-events:none;background:var(--card);border:2px solid var(--accent);box-shadow:0 10px 24px rgba(0,0,0,.35);font-weight:700}
 .dropbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 14px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(10,14,8,.82);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#fff}
@@ -1719,7 +1722,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
   }
   /* ---------- Mode: Giải đấu (cup) ---------- */
   // Mỗi trận có 2 ô; nguồn của ô là {team}, {bye} (miễn đấu), {win:id} hoặc {lose:id} của trận khác.
-  // Kết quả lưu theo đội thắng (C.res[id] = chỉ số đội, hoặc DRAW ở vòng tròn). Đổi kết quả phía trước
+  // Kết quả lưu C.res[id] = [đội thắng hoặc DRAW, đội ô trên, đội ô dưới]. Đổi kết quả phía trước
   // làm đổi người ở trận sau thì kết quả trận sau tự bị xoá khi tính lại.
   const BYE=-1, DRAW="D";
   let C=null, cupZoom=clamp(parseFloat(store.get("dua-ngong-cupzoom","1"))||1,.55,1.6), cupPick=null, cupNoClick=false;
@@ -1842,9 +1845,10 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
       if(o.a===undefined||o.b===undefined){o.st="wait";drop(i);return;}
       if(o.a===BYE&&o.b===BYE){o.w=o.l=BYE;o.st="dead";return;}
       if(o.a===BYE||o.b===BYE){o.w=o.a===BYE?o.b:o.a;o.l=BYE;o.st="bye";return;}
-      const r=C.res[i];
-      if(r===DRAW&&m.b==="R"){o.st="done";o.draw=true;return;}
-      if(r===o.a||r===o.b){o.w=r;o.l=r===o.a?o.b:o.a;o.st="done";return;}
+      // kết quả chỉ còn hiệu lực khi đúng 2 đội đã đấu (đổi người ở trận trước thì phải nhập lại)
+      const r=C.res[i], rw=Array.isArray(r)?r[0]:r, same=!Array.isArray(r)||(r[1]===o.a&&r[2]===o.b);
+      if(r!=null&&same&&rw===DRAW&&m.b==="R"){o.st="done";o.draw=true;return;}
+      if(r!=null&&same&&(rw===o.a||rw===o.b)){o.w=rw;o.l=rw===o.a?o.b:o.a;o.st="done";return;}
       drop(i); o.st="ready";
     });
     return {out,cleared};
@@ -1864,7 +1868,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     if(g1.st==="done"&&g1.w===g1.a) return {w:g1.w,r:g1.l};
     return null;
   }
-  const cupHelp=()=>window.matchMedia("(pointer:coarse)").matches?"Chạm vào một đội rồi chọn Thắng hoặc Thua. Kéo thẻ cũng được.":"Kéo thẻ một đội vào ô ✅ Thắng / ❌ Thua (hoặc thả vào ô trận kế tiếp). Bấm vào thẻ cũng được.";
+  const cupHelp=()=>"Bấm nút Thắng cạnh đội thắng, đội kia tự xuống nhánh thua. Kéo thẻ đội vào ô ✅ Thắng / ❌ Thua cũng được.";
   function openCup(){ session++; endPick(); show(scr.cup); renderCup(); }
 
   function teamCard(v,interactive,m){
@@ -1890,7 +1894,15 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     if(o.st==="off"){d.classList.add("empty"); d.textContent=s?"(nếu đội nhánh thua thắng)":"Chung kết lại";}
     else if(v===undefined){d.classList.add("empty"); d.textContent=placeholder(m.src[s]);}
     else if(v===BYE){d.classList.add("empty"); d.textContent="Miễn đấu";}
-    else d.appendChild(teamCard(v,o.st==="ready"||o.st==="done",m));
+    else{
+      const live=o.st==="ready"||o.st==="done";
+      d.appendChild(teamCard(v,live,m));
+      if(live){ // đủ 2 đội: nút chọn đội này thắng ngay trong ô
+        const wb=document.createElement("button"); wb.type="button"; wb.className="wbtn"; wb.dataset.mid=m.id; wb.dataset.team=v;
+        const isW=o.st==="done"&&!o.draw&&o.w===v; wb.textContent=isW?"✓ Thắng":"Thắng"; wb.setAttribute("aria-pressed",String(isW));
+        wb.setAttribute("aria-label",`Chọn ${C.teams[v].name} thắng trận ${C.num[m.id]||""}`); d.appendChild(wb);
+      }
+    }
     if(o.st==="done"&&!o.draw) d.classList.add(v===o.w?"win":"lose");
     if(o.st==="bye"&&v!==BYE) d.classList.add("win");
     return d;
@@ -2033,12 +2045,41 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     if(!cupPick) return;
     const {mid,team}=cupPick, o=cupCompute().out[mid]; endPick();
     if(o.st!=="ready"&&o.st!=="done") return;
-    const other=team===o.a?o.b:o.a, w=z==="draw"?DRAW:z==="win"?team:other;
-    if(C.res[mid]===w) return;
+    setWinner(mid,z==="draw"?DRAW:z==="win"?team:team===o.a?o.b:o.a);
+  }
+  // trận tiếp theo mà người thắng/người thua của trận mid sẽ vào (đi xuyên qua trận miễn đấu)
+  function nextMatch(mid,kind){
+    let id=mid, k=kind;
+    for(let g=0;g<20;g++){
+      const nx=C.M.findIndex(x=>x.src.some(s=>(k==="win"?s.win:s.lose)===id));
+      if(nx<0) return null;
+      if(!C.byeish[nx]) return nx;
+      id=nx; k="win";
+    }
+    return null;
+  }
+  function setWinner(mid,w){
+    const o=cupCompute().out[mid];
+    if(o.st!=="ready"&&o.st!=="done") return;
+    if(o.st==="done"&&(o.draw?DRAW:o.w)===w) return;
     C.undo.push(JSON.stringify(C.res)); if(C.undo.length>60) C.undo.shift();
-    C.res[mid]=w;
-    const cleared=renderCup();
-    const msg=w===DRAW?`🤝 Trận ${C.num[mid]}: ${C.teams[o.a].name} hoà ${C.teams[o.b].name}`:`✅ Trận ${C.num[mid]}: ${C.teams[w].name} thắng ${C.teams[w===o.a?o.b:o.a].name}`;
+    C.res[mid]=[w,o.a,o.b];
+    const cleared=renderCup(), nm=i=>C.teams[i].name;
+    let msg;
+    if(w===DRAW) msg=`🤝 Trận ${C.num[mid]}: ${nm(o.a)} hoà ${nm(o.b)}`;
+    else{
+      const l=w===o.a?o.b:o.a, m=C.M[mid], out=cupCompute().out, nw=nextMatch(mid,"win"), nl=nextMatch(mid,"lose");
+      msg=`✅ Trận ${C.num[mid]}: ${nm(w)} thắng ${nm(l)}`;
+      if(m.b!=="R"){
+        const pod=cupPodium(out);
+        if(pod&&pod.w===w) msg+=` · 🏆 ${nm(w)} vô địch, ${nm(l)} á quân`;
+        else if(m.b==="G") msg+=` · hai đội đá chung kết lại, trận ${C.num[nw]}`;
+        else{
+          if(nw!=null) msg+=` · ${nm(w)} vào trận ${C.num[nw]}`;
+          msg+=nl==null?` · ${nm(l)} bị loại`:C.M[nl].b==="G"?` · ${nm(l)} vào chung kết tổng, trận ${C.num[nl]}`:` · ${nm(l)} xuống nhánh thua, trận ${C.num[nl]}`;
+        }
+      }
+    }
     $("cupStatus").textContent=msg+(cleared?` · đã xoá kết quả ${cleared} trận sau vì đổi người`:"");
     blip();
   }
@@ -2083,6 +2124,8 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     window.addEventListener("pointermove",move,{passive:false}); window.addEventListener("pointerup",up); window.addEventListener("pointercancel",up);
   });
   $("cupView").addEventListener("click",e=>{
+    const wb=e.target.closest("button.wbtn");
+    if(wb){endPick(); setWinner(+wb.dataset.mid,+wb.dataset.team); return;}
     const b=e.target.closest("button.tcard"); if(!b||cupNoClick) return;
     const mid=+b.dataset.mid, team=+b.dataset.team;
     if(cupPick&&cupPick.mid===mid&&cupPick.team===team) endPick(); else beginPick(mid,team);

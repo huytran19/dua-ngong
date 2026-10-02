@@ -23,7 +23,8 @@ Thứ tự nút trên màn chuẩn bị: Đua Ngỗng, Vòng quay may mắn, Chi
   - Thể thức: `double` (nhánh thắng/thua, mặc định), `single` (loại trực tiếp), `rr` (vòng tròn, tối đa 16 đội, thắng 3 hoà 1).
   - Tạo đội: `solo` (mỗi dòng 1 đội), `random` (ghép ngẫu nhiên đội 2–5 người, dư người thì vài đội hơn 1), `preset` (dòng `Tên đội: người 1, người 2`). Chia team xong có nút tạo bảng đấu từ các đội đó.
   - `buildCup()` dựng danh sách trận; mỗi ô có nguồn `{team}`, `{bye}`, `{win:id}`, `{lose:id}`. Hạt giống xếp theo `seedOrder` (1 gặp hạt cuối), số đội không tròn 2^k thì có miễn đấu. Nhánh thua đảo thứ tự người rớt xen kẽ cho khỏi gặp lại sớm. Chung kết tổng có trận "chung kết lại" chỉ đá khi đội từ nhánh thua thắng.
-  - Kết quả lưu theo **đội thắng** (`C.res[id]`). `cupCompute()` tính lại toàn bộ mỗi lần; trận sau đổi người thì kết quả cũ tự bị xoá (báo "đã xoá kết quả N trận sau").
+  - Kết quả lưu `C.res[id] = [đội thắng hoặc "D", đội ô trên, đội ô dưới]`. `cupCompute()` tính lại toàn bộ mỗi lần; trận nào đổi người (dù đội thắng cũ vẫn còn trong trận) thì kết quả cũ tự bị xoá và báo "đã xoá kết quả N trận sau".
+  - Mỗi ô có đội trong trận đã đủ 2 đội đều có nút **Thắng** (`.wbtn`). Bấm là ghi kết quả ngay; thông báo ghi rõ đội thắng vào trận nào, đội thua xuống nhánh thua trận nào hay bị loại (`nextMatch()`, đi xuyên qua trận miễn đấu).
   - Nhập kết quả: kéo thẻ đội (pointer events, thẻ có `touch-action:none`) thả vào ô ✅ Thắng / ❌ Thua trên thanh dưới, hoặc thả vào ô của trận kế tiếp; kéo sát mép thì tự cuộn. Chạm/bấm thẻ thì hiện thanh để chọn.
   - Giải đang dở lưu ở `dua-ngong-cup` (không lưu danh sách trận, mở lại thì dựng lại). Có vô địch thì ghi vào lịch sử.
 ## Danh sách tên
