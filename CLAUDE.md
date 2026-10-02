@@ -26,6 +26,7 @@ Thứ tự nút trên màn chuẩn bị: Đua Ngỗng, Vòng quay may mắn, Chi
   - Kết quả lưu `C.res[id] = [đội thắng hoặc "D", đội ô trên, đội ô dưới]`. `cupCompute()` tính lại toàn bộ mỗi lần; trận nào đổi người (dù đội thắng cũ vẫn còn trong trận) thì kết quả cũ tự bị xoá và báo "đã xoá kết quả N trận sau".
   - Mỗi ô có đội trong trận đã đủ 2 đội đều có nút **Thắng** (`.wbtn`). Bấm là ghi kết quả ngay; thông báo ghi rõ đội thắng vào trận nào, đội thua xuống nhánh thua trận nào hay bị loại (`nextMatch()`, đi xuyên qua trận miễn đấu).
   - Nhập kết quả: kéo thẻ đội (pointer events, thẻ có `touch-action:none`) thả vào ô ✅ Thắng / ❌ Thua trên thanh dưới, hoặc thả vào ô của trận kế tiếp; kéo sát mép thì tự cuộn. Chạm/bấm thẻ thì hiện thanh để chọn.
+  - Nút **🔀 Đổi chỗ** (không có ở vòng tròn): đổi vị trí 2 đội ở vòng 1, kể cả đội đang miễn đấu, bằng cách bấm 2 đội hoặc kéo đội này thả lên đội kia. Vị trí lưu ở `C.seat[k]` (vị trí k trên bảng là đội nào), `buildCup` dựng trận theo đó. Trận bị đổi người thì xoá kết quả; đảo 2 đội trong cùng trận thì giữ. Hoàn tác lưu cả kết quả lẫn vị trí.
   - Giải đang dở lưu ở `dua-ngong-cup` (không lưu danh sách trận, mở lại thì dựng lại). Có vô địch thì ghi vào lịch sử.
 ## Danh sách tên
 - Mọi mode: 2–40 tên (Giải đấu: 64 dòng). Quá giới hạn thì báo lỗi và không cho chơi (không cắt bớt).

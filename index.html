@@ -307,6 +307,10 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
 .wbtn{appearance:none;flex:none;align-self:center;margin:0 4px 0 2px;border:1.5px solid var(--line);background:transparent;color:var(--muted);border-radius:7px;padding:3px 7px;font:inherit;font-size:calc(var(--fs) * .76);font-weight:800;line-height:1.1;cursor:pointer;white-space:nowrap}
 .wbtn:hover{border-color:#6AB04C;color:#8FD06E}
 .slot.win .wbtn{background:#6AB04C;border-color:#6AB04C;color:#10200C}
+#cupSwap[aria-pressed="true"]{background:var(--accent);color:#1b1b1b;border-color:var(--accent)}
+.swap-mode .match.st-bye{opacity:1}
+.swap-mode button.tcard.swapable{outline:2px dashed var(--accent);outline-offset:-2px;cursor:pointer}
+.swap-mode button.tcard.swapable.hot{background:rgba(242,154,46,.3)}
 .tcard.picked{outline:3px solid var(--accent);background:rgba(242,154,46,.18)}
 .tcard.ghost{position:fixed;left:0;top:0;z-index:60;pointer-events:none;background:var(--card);border:2px solid var(--accent);box-shadow:0 10px 24px rgba(0,0,0,.35);font-weight:700}
 .dropbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 14px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(10,14,8,.82);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#fff}
@@ -502,6 +506,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
       <div class="cup-tools">
         <button class="mini-btn" id="cupZoomOut" aria-label="Thu nhỏ bảng">−</button>
         <button class="mini-btn" id="cupZoomIn" aria-label="Phóng to bảng">+</button>
+        <button class="mini-btn" id="cupSwap" aria-pressed="false">🔀 Đổi chỗ</button>
         <button class="mini-btn" id="cupUndo">↶ Hoàn tác</button>
         <button class="mini-btn" id="cupCopy">📋 Sao chép</button>
         <button class="mini-btn" id="cupFull">⛶ Toàn màn hình</button>
@@ -1786,7 +1791,9 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
   }
   function cupSave(){const {M,num,sOut,byeish,...d}=C; store.set(CUP_KEY,JSON.stringify(d));}
   function cupPrep(){
-    C.M=buildCup(C.teams.length,C.fmt);
+    const n=C.teams.length;
+    if(!Array.isArray(C.seat)||C.seat.length!==n) C.seat=[...Array(n).keys()]; // vị trí k trên bảng là đội C.seat[k]
+    C.M=buildCup(n,C.fmt,C.seat);
     // trạng thái tĩnh (khi chưa có kết quả nào) để đánh số trận và biết trận nào miễn đấu
     const res=C.res; C.res={}; C.sOut=cupCompute().out; C.res=res;
     const key=m=>m.b==="W"?m.r*2-1:m.b==="L"?m.r+1.5:m.b==="G"?1000+m.r:m.r;
@@ -1798,10 +1805,11 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
   }
   // vị trí chuẩn của hạt giống: hạt 1 gặp hạt cuối, hạt 1 và 2 chỉ gặp nhau ở chung kết
   function seedOrder(P){let o=[1]; while(o.length<P){const m=o.length*2+1; o=o.flatMap(x=>[x,m-x]);} return o;}
-  function buildCup(n,fmt){
+  function buildCup(n,fmt,seat){
+    seat=seat||[...Array(n).keys()];
     const M=[], add=m=>{m.id=M.length;M.push(m);return m.id;};
     if(fmt==="rr"){ // xếp lịch vòng tròn kiểu xoay vòng, lẻ đội thì mỗi vòng một đội nghỉ
-      let ids=[...Array(n).keys()]; if(n%2) ids.push(BYE);
+      let ids=seat.slice(); if(n%2) ids.push(BYE);
       const N=ids.length;
       for(let r=1;r<N;r++){
         for(let i=0;i<N/2;i++){const a=ids[i],b=ids[N-1-i]; if(a!==BYE&&b!==BYE) add({b:"R",r,i,src:[{team:a},{team:b}]});}
@@ -1810,7 +1818,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
       return M;
     }
     const k=Math.max(1,Math.ceil(Math.log2(n))), P=1<<k, so=seedOrder(P), W=[];
-    W[1]=[]; for(let i=0;i<P/2;i++){const a=so[2*i]-1,b=so[2*i+1]-1; W[1].push(add({b:"W",r:1,i,src:[a<n?{team:a}:{bye:1},b<n?{team:b}:{bye:1}]}));}
+    W[1]=[]; for(let i=0;i<P/2;i++){const a=so[2*i]-1,b=so[2*i+1]-1; W[1].push(add({b:"W",r:1,i,src:[a<n?{team:seat[a],seat:a}:{bye:1},b<n?{team:seat[b],seat:b}:{bye:1}]}));}
     for(let r=2;r<=k;r++){W[r]=[]; for(let i=0;i<P>>r;i++) W[r].push(add({b:"W",r,i,src:[{win:W[r-1][2*i]},{win:W[r-1][2*i+1]}]}));}
     if(fmt==="single") return M;
     let prev=null, q=0;
@@ -1842,7 +1850,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
       if(o.a===BYE&&o.b===BYE){o.w=o.l=BYE;o.st="dead";return;}
       if(o.a===BYE||o.b===BYE){o.w=o.a===BYE?o.b:o.a;o.l=BYE;o.st="bye";return;}
       // kết quả chỉ còn hiệu lực khi đúng 2 đội đã đấu (đổi người ở trận trước thì phải nhập lại)
-      const r=C.res[i], rw=Array.isArray(r)?r[0]:r, same=!Array.isArray(r)||(r[1]===o.a&&r[2]===o.b);
+      const r=C.res[i], rw=Array.isArray(r)?r[0]:r, same=!Array.isArray(r)||(r[1]===o.a&&r[2]===o.b)||(r[1]===o.b&&r[2]===o.a);
       if(r!=null&&same&&rw===DRAW&&m.b==="R"){o.st="done";o.draw=true;return;}
       if(r!=null&&same&&(rw===o.a||rw===o.b)){o.w=rw;o.l=rw===o.a?o.b:o.a;o.st="done";return;}
       drop(i); o.st="ready";
@@ -1865,7 +1873,27 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     return null;
   }
   const cupHelp=()=>"Bấm nút Thắng cạnh đội thắng, đội kia tự xuống nhánh thua. Kéo thẻ đội vào ô ✅ Thắng / ❌ Thua cũng được.";
-  function openCup(){ session++; endPick(); show(scr.cup); renderCup(); }
+  function openCup(){ session++; endPick(); setSwap(false); show(scr.cup); renderCup(); }
+  function pushUndo(){C.undo.push(JSON.stringify({res:C.res,seat:C.seat})); if(C.undo.length>60) C.undo.shift();}
+  // Đổi chỗ: đổi vị trí 2 đội ở vòng 1 (kể cả đội đang được miễn đấu). Trận bị đổi người thì kết quả tự xoá.
+  let cupSwap=false, swapSel=null;
+  function setSwap(on){
+    cupSwap=on; swapSel=null;
+    $("cupSwap").setAttribute("aria-pressed",String(on)); $("cupSwap").textContent=on?"✓ Xong đổi chỗ":"🔀 Đổi chỗ";
+    $("cupView").classList.toggle("swap-mode",on);
+  }
+  function swapSeats(k1,k2){
+    if(k1===k2) return;
+    const a=C.seat[k1], b=C.seat[k2]; pushUndo();
+    C.seat[k1]=b; C.seat[k2]=a; cupPrep(); swapSel=null;
+    const cleared=renderCup();
+    $("cupStatus").textContent=`🔀 Đã đổi chỗ ${C.teams[a].name} và ${C.teams[b].name}`+(cleared?` · đã xoá kết quả ${cleared} trận vì đổi người`:"");
+    blip();
+  }
+  $("cupSwap").addEventListener("click",()=>{
+    if(!C) return; endPick(); setSwap(!cupSwap); renderCup();
+    $("cupStatus").textContent=cupSwap?"Bấm 2 đội ở vòng 1 (hoặc kéo đội này thả lên đội kia) để đổi chỗ, kể cả đội đang được miễn đấu. Xong thì bấm ✓ Xong đổi chỗ.":cupHelp();
+  });
 
   function teamCard(v,interactive,m){
     const t=C.teams[v], el=document.createElement(interactive?"button":"div");
@@ -1891,8 +1919,9 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     else if(v===undefined){d.classList.add("empty"); d.textContent=placeholder(m.src[s]);}
     else if(v===BYE){d.classList.add("empty"); d.textContent="Miễn đấu";}
     else{
-      const live=o.st==="ready"||o.st==="done";
-      d.appendChild(teamCard(v,live,m));
+      const sw=cupSwap&&m.src[s].seat!=null, live=!cupSwap&&(o.st==="ready"||o.st==="done");
+      const card=teamCard(v,live||sw,m); d.appendChild(card);
+      if(sw){card.dataset.seat=m.src[s].seat; card.classList.add("swapable"); card.setAttribute("aria-label",`Đổi chỗ ${C.teams[v].name}`);}
       if(live){ // đủ 2 đội: nút chọn đội này thắng ngay trong ô
         const wb=document.createElement("button"); wb.type="button"; wb.className="wbtn"; wb.dataset.mid=m.id; wb.dataset.team=v;
         const isW=o.st==="done"&&!o.draw&&o.w===v; wb.textContent=isW?"✓ Thắng":"Thắng"; wb.setAttribute("aria-pressed",String(isW));
@@ -1922,6 +1951,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     const sp=document.createElement("div"); sp.className="cup-spacer"; view.appendChild(sp); // chừa chỗ để cuộn ô cuối lên trên thanh Thắng/Thua
     view.scrollLeft=keep[0]; view.scrollTop=keep[1];
     $("cupUndo").disabled=!C.undo.length;
+    $("cupSwap").hidden=C.fmt==="rr"; // vòng tròn thì ai cũng gặp nhau, đổi chỗ không có nghĩa
     // nhà vô địch
     const pod=cupPodium(out), ch=$("cupChamp");
     ch.hidden=!pod;
@@ -2058,7 +2088,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     const o=cupCompute().out[mid];
     if(o.st!=="ready"&&o.st!=="done") return;
     if(o.st==="done"&&(o.draw?DRAW:o.w)===w) return;
-    C.undo.push(JSON.stringify(C.res)); if(C.undo.length>60) C.undo.shift();
+    pushUndo();
     C.res[mid]=[w,o.a,o.b];
     const cleared=renderCup(), nm=i=>C.teams[i].name;
     let msg;
@@ -2101,11 +2131,16 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
       if(ev.pointerId!==st.id) return;
       if(!st.drag){
         if(Math.hypot(ev.clientX-st.x,ev.clientY-st.y)<7) return;
-        st.drag=true; beginPick(+b.dataset.mid,+b.dataset.team); $("dropbar").classList.add("dragging");
+        st.drag=true; if(!cupSwap){beginPick(+b.dataset.mid,+b.dataset.team); $("dropbar").classList.add("dragging");}
         const g=b.cloneNode(true); g.classList.add("ghost"); g.classList.remove("picked"); g.style.width=b.offsetWidth+"px"; document.body.appendChild(g); st.ghost=g;
       }
       ev.preventDefault(); st.px=ev.clientX; st.py=ev.clientY; if(!st.raf) st.raf=requestAnimationFrame(edge);
       st.ghost.style.transform=`translate(${ev.clientX-st.ghost.offsetWidth/2}px,${ev.clientY-st.ghost.offsetHeight/2}px)`;
+      if(cupSwap){ // sáng thẻ sắp đổi chỗ
+        const el=document.elementFromPoint(ev.clientX,ev.clientY), t=el&&el.closest("button.tcard.swapable");
+        document.querySelectorAll("#cupView .swapable.hot").forEach(x=>{if(x!==t) x.classList.remove("hot");}); if(t&&t!==b) t.classList.add("hot");
+        return;
+      }
       const z=dropAt(ev.clientX,ev.clientY);
       document.querySelectorAll(".dropzone").forEach(d=>d.classList.toggle("hot",d.dataset.z===z));
     };
@@ -2114,6 +2149,11 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
       window.removeEventListener("pointermove",move); window.removeEventListener("pointerup",up); window.removeEventListener("pointercancel",up);
       if(!st.drag) return;
       cancelAnimationFrame(st.raf); st.ghost.remove(); cupNoClick=true; setTimeout(()=>cupNoClick=false,0);
+      if(cupSwap){
+        const el=ev.type==="pointerup"&&document.elementFromPoint(ev.clientX,ev.clientY), t=el&&el.closest("button.tcard.swapable");
+        if(t&&b.dataset.seat!=null) swapSeats(+b.dataset.seat,+t.dataset.seat); else renderCup();
+        return;
+      }
       const z=ev.type==="pointerup"?dropAt(ev.clientX,ev.clientY):null;
       if(z) applyPick(z); else endPick();
     };
@@ -2123,6 +2163,16 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     const wb=e.target.closest("button.wbtn");
     if(wb){endPick(); setWinner(+wb.dataset.mid,+wb.dataset.team); return;}
     const b=e.target.closest("button.tcard"); if(!b||cupNoClick) return;
+    if(cupSwap){ // bấm đội thứ nhất để chọn, bấm đội thứ hai để đổi chỗ
+      if(b.dataset.seat==null) return;
+      const k=+b.dataset.seat;
+      if(swapSel==null||swapSel===k){
+        swapSel=swapSel===k?null:k;
+        document.querySelectorAll("#cupView .picked").forEach(x=>x.classList.remove("picked")); if(swapSel!=null) b.classList.add("picked");
+        $("cupStatus").textContent=swapSel!=null?`Đã chọn ${C.teams[C.seat[k]].name}, bấm đội muốn đổi chỗ.`:"Bấm 2 đội ở vòng 1 để đổi chỗ.";
+      } else swapSeats(swapSel,k);
+      return;
+    }
     const mid=+b.dataset.mid, team=+b.dataset.team;
     if(cupPick&&cupPick.mid===mid&&cupPick.team===team) endPick(); else beginPick(mid,team);
   });
@@ -2136,7 +2186,9 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
   $("cupZoomOut").addEventListener("click",()=>setZoom(-.15));
   $("cupUndo").addEventListener("click",()=>{
     if(!C||!C.undo.length) return;
-    endPick(); C.res=JSON.parse(C.undo.pop()); renderCup(); $("cupStatus").textContent="↶ Đã hoàn tác kết quả vừa nhập.";
+    endPick(); const u=JSON.parse(C.undo.pop());
+    if(u&&u.res){C.res=u.res; if(u.seat){C.seat=u.seat; cupPrep();}} else C.res=u; // bản cũ chỉ lưu kết quả
+    renderCup(); $("cupStatus").textContent="↶ Đã hoàn tác thao tác vừa rồi.";
   });
   $("cupCopy").addEventListener("click",e=>{
     if(!C) return;
