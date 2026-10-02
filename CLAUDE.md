@@ -9,18 +9,25 @@ Game bốc thăm/giveaway chạy trên trình duyệt, dùng cho guild. Toàn b�
   - **Setup**: `MODE_INFO`, tên gọi theo đàn thú (`noun()`, `Noun()`), các tuỳ chọn, cặp dính/cấm, nút xáo tên, `go()`, `solveTeams()`.
   - **Lịch sử các ván**: lưu localStorage `dua-ngong-history`, tối đa 100 ván.
   - **Result screen**: `showResult(cfg)` dùng chung cho mọi mode.
-  - **Mode: Đua Ngỗng (give)**, **Chia team**, **Sinh tồn**, **Trứng nở**, **Vòng quay may mắn (pass)** (`startRing`).
+  - **Mode: Đua Ngỗng (give)**, **Chia team**, **Sinh tồn**, **Trứng nở**, **Vòng quay may mắn (pass)** (`startRing`), **Giải đấu (cup)** ở cuối file.
 
-## 5 mode
-Thứ tự nút trên màn chuẩn bị: Đua Ngỗng, Vòng quay may mắn, Chia team, Sinh tồn, Trứng nở. Mã mode trong code vẫn giữ tên cũ (`give`, `pass`).
+## 6 mode
+Thứ tự nút trên màn chuẩn bị: Đua Ngỗng, Vòng quay may mắn, Chia team, Sinh tồn, Trứng nở, Giải đấu. Mã mode trong code vẫn giữ tên cũ (`give`, `pass`).
 - **give** (hiển thị: "Đua Ngỗng"): đua ngang, camera bám con dẫn đầu, 3 độ dài 15/30/50s.
 - **team**: 2/3/4 đội đều sĩ số; cặp "dính" (union-find) và "không chung chuồng"; giải bằng quay lui có trọng số trong `solveTeams`. Tốc độ Nhanh/Vừa/Lề mề có giờ tối đa 15/30/60s (gần hết giờ thì hết lưỡng lự, chạm mốc thì lùa thẳng vào chuồng).
 - **survive**: mỗi lần loại bốc đều 1 con còn sống, nên ai cũng 1/n.
 - **egg**: trứng nứt dần, mẹ ấp quả nào thì quả đó ấm hơn.
 - **pass** (hiển thị: "Vòng quay may mắn", trước đây là "Tranh Pass"): nhấn giữ lệnh bài lấy đà. Người thắng **bốc lúc thả tay**; lực chỉ quyết định số vòng (nhẹ 7–9, mạnh nhất 15–17). Dưới 15 người: ghế quanh sân; 15–40 người: vòng chia lát. Tên giải tuỳ chỉnh (mặc định "Battle Pass"), có tuỳ chọn né người vừa thắng.
 
+- **cup** (Giải đấu): không có thú chạy, chỉ là bảng đấu. Màn bảng đấu thêm class `wide` trên body để dùng hết bề ngang, có nút toàn màn hình (Fullscreen API, iPhone không có thì ẩn nút), phóng to/thu nhỏ (`dua-ngong-cupzoom`), hoàn tác, sao chép.
+  - Thể thức: `double` (nhánh thắng/thua, mặc định), `single` (loại trực tiếp), `rr` (vòng tròn, tối đa 16 đội, thắng 3 hoà 1).
+  - Tạo đội: `solo` (mỗi dòng 1 đội), `random` (ghép ngẫu nhiên đội 2–5 người, dư người thì vài đội hơn 1), `preset` (dòng `Tên đội: người 1, người 2`). Chia team xong có nút tạo bảng đấu từ các đội đó.
+  - `buildCup()` dựng danh sách trận; mỗi ô có nguồn `{team}`, `{bye}`, `{win:id}`, `{lose:id}`. Hạt giống xếp theo `seedOrder` (1 gặp hạt cuối), số đội không tròn 2^k thì có miễn đấu. Nhánh thua đảo thứ tự người rớt xen kẽ cho khỏi gặp lại sớm. Chung kết tổng có trận "chung kết lại" chỉ đá khi đội từ nhánh thua thắng.
+  - Kết quả lưu theo **đội thắng** (`C.res[id]`). `cupCompute()` tính lại toàn bộ mỗi lần; trận sau đổi người thì kết quả cũ tự bị xoá (báo "đã xoá kết quả N trận sau").
+  - Nhập kết quả: kéo thẻ đội (pointer events, thẻ có `touch-action:none`) thả vào ô ✅ Thắng / ❌ Thua trên thanh dưới, hoặc thả vào ô của trận kế tiếp; kéo sát mép thì tự cuộn. Chạm/bấm thẻ thì hiện thanh để chọn.
+  - Giải đang dở lưu ở `dua-ngong-cup` (không lưu danh sách trận, mở lại thì dựng lại). Có vô địch thì ghi vào lịch sử.
 ## Danh sách tên
-- Mọi mode: 2–40 tên. Quá 40 thì báo lỗi và không cho chơi (không cắt bớt).
+- Mọi mode: 2–40 tên (Giải đấu: 64 dòng). Quá giới hạn thì báo lỗi và không cho chơi (không cắt bớt).
 - Tên trùng (không phân biệt hoa thường, khoảng trắng) bị chặn trước khi chơi, vì cặp dính/cấm, "Loại, chơi tiếp" và "Né người vừa thắng" đều so theo tên. Cảnh báo hiện ngay dưới ô nhập (`listProblem()`).
 
 ## Random
@@ -46,7 +53,7 @@ Thứ tự nút trên màn chuẩn bị: Đua Ngỗng, Vòng quay may mắn, Chi
 ## Deploy
 - Repo public `huytran19/dua-ngong`, GitHub Pages từ branch `main`, thư mục root: https://huytran19.github.io/dua-ngong/
 - Push lên `main` là Pages tự build lại (khoảng 1 phút).
-- Link riêng từng mode: `/giveaway/` (Đua Ngỗng), `/vong-quay/` (Vòng quay may mắn), `/chia-team/`, `/sinh-ton/`, `/trung-no/`. `/tranh-pass/` là link cũ, giữ lại để link đã gửi vẫn chạy. Mỗi thư mục chỉ có một `index.html` nhỏ chứa thẻ Open Graph (thẻ xem trước khi dán vào Discord) rồi chuyển về `../?mode=<mode>`. Game đọc `?mode=` lúc mở và cập nhật lại URL khi đổi mode.
+- Link riêng từng mode: `/giveaway/` (Đua Ngỗng), `/vong-quay/` (Vòng quay may mắn), `/chia-team/`, `/sinh-ton/`, `/trung-no/`, `/giai-dau/`. `/tranh-pass/` là link cũ, giữ lại để link đã gửi vẫn chạy. Mỗi thư mục chỉ có một `index.html` nhỏ chứa thẻ Open Graph (thẻ xem trước khi dán vào Discord) rồi chuyển về `../?mode=<mode>`. Game đọc `?mode=` lúc mở và cập nhật lại URL khi đổi mode.
 - Ảnh xem trước 1200x630 ở `og/` (`home.jpg` cho trang chính, `<mode>.jpg` cho từng link). Tạo bằng Playwright: chụp khu vực chơi giữa ván rồi ghép với tiêu đề. Đổi giao diện nhiều thì chụp lại.
 - Discord lưu thẻ xem trước khá lâu, sửa ảnh xong có thể phải chờ hoặc thêm `?v=2` vào link.
 
