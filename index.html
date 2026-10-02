@@ -85,22 +85,21 @@ select{font:inherit;font-size:15px;padding:9px 6px;border:2px solid var(--line);
 .ropes{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
 
 /* Sprite */
-.spr{display:block;background-image:var(--sheet);background-repeat:no-repeat;image-rendering:pixelated;image-rendering:crisp-edges}
+.spr{display:block;background-repeat:no-repeat;image-rendering:pixelated;image-rendering:crisp-edges}
 .goose{position:absolute;left:0;top:0;z-index:3;will-change:transform}
 .goose .spr{width:100%;height:100%}
 .badge{position:absolute;left:4%;top:50%;transform:translateY(-10%);min-width:15px;height:15px;padding:0 3px;border-radius:5px;color:#fff;font-size:10px;font-weight:800;line-height:12px;text-align:center;border:1.5px solid #1b1b1b;z-index:1}
 .gname{position:absolute;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7),0 0 4px rgba(0,0,0,.35);pointer-events:none}
 .bubble{position:absolute;bottom:55%;left:88%;font-size:12px;font-weight:800;background:#fff;color:#1b1b1b;border-radius:8px;padding:1px 6px;white-space:nowrap;opacity:0;transition:opacity .15s;pointer-events:none;z-index:2}
 .bubble.on{opacity:1}
-.crown{position:absolute;top:-8px;left:40%;font-size:14px;display:none;z-index:2}
-.goose.lead .crown{display:block}
+.crown{position:absolute;top:-8px;left:40%;font-size:14px;z-index:2;pointer-events:none}
 
 /* Đua Ngỗng (mode give) */
 .mini{position:relative;height:22px;background:var(--card);border:2px solid var(--line);border-radius:999px}
 .mini i{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;margin:-5.5px 0 0 -5.5px;border:1.5px solid #1b1b1b}
 .mini b{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:13px}
 .track-wrap{position:relative;overflow:hidden;border:3px solid var(--frame);border-radius:16px;background:var(--grass-a)}
-.world{position:absolute;left:0;top:0;will-change:transform}
+.world{position:absolute;left:0;top:0}
 .lane{position:absolute;left:0;right:0}
 .lane.a{background:var(--grass-a)} .lane.b{background:var(--grass-b)}
 .marker{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed rgba(255,255,255,.55);z-index:1}
@@ -169,18 +168,20 @@ select{font:inherit;font-size:15px;padding:9px 6px;border:2px solid var(--line);
 .mode-arena .gname{left:50%;top:100%;transform:translateX(-50%);font-size:11px;max-width:92px;margin-top:-3px}
 .hpb{position:absolute;left:18%;right:18%;top:-8px;height:5px;background:rgba(0,0,0,.5);border-radius:3px;overflow:hidden;z-index:2}
 .hpb i{display:block;height:100%;width:100%;background:#6AB04C;transition:width .15s,background .15s}
-.wpn{position:absolute;left:72%;top:22%;z-index:2;line-height:1;pointer-events:none}
-.goose.fl .wpn{left:auto;right:72%;scale:-1 1}
-.wpn i{display:block;font-style:normal;transform-origin:25% 85%}
-.wpn i.swing{animation:swing .25s ease-out}
-@keyframes swing{0%{transform:rotate(-70deg)}55%{transform:rotate(45deg)}100%{transform:rotate(0)}}
+.vl{position:absolute;left:50%;top:100%;background-image:var(--volam);background-repeat:no-repeat;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none}
+.goose.warrior .vl{z-index:1}
+.foot{position:absolute;left:50%;bottom:-4px;width:110%;height:9px;border-radius:50%;transform:translateX(-50%);opacity:.8}
+.goose.dead{z-index:1;transition:opacity .6s}
+.goose.dead .hpb,.goose.dead .foot,.goose.dead .gname{display:none}
+.goose.dead.gone{opacity:0}
+.winner .g .vl{top:100%}
 .goose.hurt .spr{filter:brightness(1.6) sepia(1) saturate(6) hue-rotate(-40deg)}
+.goose.hurt .vl{filter:brightness(1.9) saturate(.5)}
 .dmg{position:absolute;z-index:6;transform:translate(-50%,0);font-weight:800;font-size:14px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8),0 0 3px rgba(0,0,0,.5);pointer-events:none;white-space:nowrap;animation:dmgup .9s ease-out forwards}
 .dmg.crit{font-size:19px;color:#FFD23F}
 .dmg.miss{color:#BFD7FF;font-size:12px}
 .dmg.heal{color:#7DFF8A}
 @keyframes dmgup{0%{opacity:0;margin-top:4px}15%{opacity:1}100%{opacity:0;margin-top:-34px}}
-.shot{position:absolute;left:0;top:0;z-index:5;font-size:16px;line-height:1;margin:-8px 0 0 -8px;pointer-events:none}
 .heart{position:absolute;z-index:2;font-size:18px;transform:translate(-50%,-70%);animation:heartbob 1s ease-in-out infinite alternate;pointer-events:none}
 @keyframes heartbob{from{margin-top:0}to{margin-top:-5px}}
 .zone{position:absolute;border-radius:50%;pointer-events:none;z-index:1;border:3px dashed transparent;transition:border-color .3s}
@@ -600,7 +601,21 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
 
   /* ---------- Sprites ---------- */
   const SHEET="data:image/png;base64,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";
-  document.documentElement.style.setProperty("--sheet",`url(${SHEET})`);
+  // Gắn ảnh vào một quy tắc CSS (đọc một lần). Đừng dùng biến CSS var(--sheet): mỗi lần tính lại style cho
+  // một con thú, trình duyệt phải chép lại nguyên chuỗi base64 rất dài, đông thú là giật.
+  // Ảnh sprite đổi sang đường dẫn blob: ngắn. Data URL dài hàng chục KB làm mỗi lần tính lại style cho một con thú
+  // phải xử lý lại cả chuỗi (đo được: Đua Ngỗng 40 con tốn ~26µs/phần tử, gấp 2,6 lần khi dùng đường dẫn ngắn).
+  const blobUrl=d=>{try{const [h,b]=d.split(","), bin=atob(b), u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);
+    return URL.createObjectURL(new Blob([u],{type:h.slice(5).split(";")[0]}));}catch(e){return d;}};
+  const SHEET_URL=blobUrl(SHEET);
+  {const st=document.createElement("style"); st.textContent=`.spr{background-image:url(${SHEET_URL})}`; document.head.appendChild(st);}
+  // Nhân vật mode Sinh tồn (kiếm hiệp, chỉ cận chiến): LuizMelo – Martial Hero 1–3 (CC0).
+  // Ảnh riêng sprites/vo-lam.png, chỉ tải khi vào Sinh tồn. Mỗi nhân vật một khối hàng: idle, run, a1, a2, hit, death.
+  // Ô cw×ch; (ax, ay) là điểm chân trong ô; bodyH là chiều cao người lúc đứng.
+  const VL_SRC="sprites/vo-lam.png";
+  const VL={"W":1397,"H":1440,"chars":[{"id":"dao","y":0,"cw":130,"ch":71,"ax":29,"ay":69,"bodyH":52,"anims":{"idle":{"row":0,"n":8},"run":{"row":1,"n":8},"a1":{"row":2,"n":6},"a2":{"row":3,"n":6},"hit":{"row":4,"n":4},"death":{"row":5,"n":6}}},{"id":"kiem","y":426,"cw":117,"ch":87,"ax":27,"ay":84,"bodyH":56,"anims":{"idle":{"row":0,"n":4},"run":{"row":1,"n":8},"a1":{"row":2,"n":4},"a2":{"row":3,"n":4},"hit":{"row":4,"n":3},"death":{"row":5,"n":7}}},{"id":"daidao","y":948,"cw":127,"ch":82,"ax":69,"ay":80,"bodyH":41,"anims":{"idle":{"row":0,"n":10},"run":{"row":1,"n":8},"a1":{"row":2,"n":7},"a2":{"row":3,"n":9},"hit":{"row":4,"n":3},"death":{"row":5,"n":11}}}]};
+  const VL_FPS={idle:8,run:12,a1:14,a2:14,hit:12,death:10};
+  document.documentElement.style.setProperty("--volam",`url(${VL_SRC})`);
   // Sheet 264x432: mỗi ô 40x32 (bước 44x36), mọi con đều quay mặt sang phải. flap = bứt tốc, cheer = ăn mừng.
   const SPECIES=["goose","bunny","squirrel","penguin"];
   const SP_INFO={
@@ -681,7 +696,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
       }
     }
     g.putImageData(d,0,0);
-    const url=cv.toDataURL("image/png"); tintCache.set(hex,url); return url;
+    const url=blobUrl(cv.toDataURL("image/png")); tintCache.set(hex,url); return url;
   }
   const sprites=new Set();
   function makeSprite(getAnim,species,tint){
@@ -691,26 +706,49 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     const sp={el,getAnim,sp:s,phase:rnd()*10,added:false,tint:tint||null,tinted:!tint};
     sprites.add(sp); return sp;
   }
+  // Đọc kích thước của mọi con trước rồi mới ghi style: đọc xen kẽ với ghi bắt trình duyệt tính lại bố cục
+  // cả trang cho từng con, rất chậm khi đông (nhất là đường đua dài). Kích thước chỉ đo lại mỗi ~1 giây.
+  let paintN=0;
   function paint(t){
+    const remeasure=(paintN++%60)===0;
+    for(const sp of sprites) if(!sp.vl&&sp.el.isConnected&&(remeasure||sp.h===undefined)) sp.h=sp.el.clientHeight;
     for(const sp of sprites){
       if(!sp.el.isConnected){ if(sp.added) sprites.delete(sp); continue; }
-      const h=sp.el.clientHeight; if(!h) continue;
+      if(sp.vl){ // nhân vật kiếm hiệp: đứng/chạy lặp lại, các động tác khác chạy một lần rồi giữ khung cuối
+        sp.added=true;
+        const st=sp.getAnim(), c=sp.c, an=c.anims[st.a]||c.anims.idle, fps=VL_FPS[st.a]||8;
+        const f=(st.a==="idle"||st.a==="run")?Math.floor((t/1000+sp.phase)*fps)%an.n:Math.min(an.n-1,Math.floor(Math.max(0,t-st.t0)/1000*fps));
+        const key=an.row*100+f;
+        if(key!==sp.f){sp.f=key; sp.el.style.backgroundPosition=`${(-f*c.cw*sp.s).toFixed(1)}px ${(-(c.y+an.row*c.ch)*sp.s).toFixed(1)}px`;}
+        continue;
+      }
+      const h=sp.h; if(!h) continue;
       sp.added=true;
       if(!sp.tinted){const u=tintedSheet(sp.tint); if(u){sp.el.style.backgroundImage=`url(${u})`;sp.tinted=true;}}
       const set=ANIMS[sp.sp], k=h/32, a=set[sp.getAnim()]||set.idle;
       const f=Math.floor((t/1000+sp.phase)*a.fps)%a.n;
-      // mỗi ô 40x32 có viền trống 2px quanh, để khi phóng to không bị ăn lem sang ô bên cạnh
-      sp.el.style.backgroundSize=`${264*k}px ${432*k}px`;
-      sp.el.style.backgroundPosition=`${-(f*44+2)*k}px ${-(a.row*36+2)*k}px`;
+      // mỗi ô 40x32 có viền trống 2px quanh, để khi phóng to không bị ăn lem sang ô bên cạnh; chỉ ghi khi có thay đổi
+      if(h!==sp.lastH){sp.lastH=h; sp.el.style.backgroundSize=`${264*k}px ${432*k}px`; sp.f=-1;}
+      const key=a.row*100+f;
+      if(key!==sp.f){sp.f=key; sp.el.style.backgroundPosition=`${-(f*44+2)*k}px ${-(a.row*36+2)*k}px`;}
     }
     requestAnimationFrame(paint);
   }
   requestAnimationFrame(paint);
 
+  // Nhân vật kiếm hiệp cao bodyPx (tính theo người lúc đứng), neo ở chân: đặt trong một khung có chân ở giữa đáy
+  function fighterSprite(cid,bodyPx,getAnim){
+    const c=VL.chars.find(x=>x.id===cid)||VL.chars[0], s=bodyPx/c.bodyH, el=document.createElement("div"); el.className="vl";
+    el.style.cssText=`width:${(c.cw*s).toFixed(1)}px;height:${(c.ch*s).toFixed(1)}px;margin-left:${(-c.ax*s).toFixed(1)}px;margin-top:${(-c.ay*s).toFixed(1)}px;background-size:${(VL.W*s).toFixed(1)}px ${(VL.H*s).toFixed(1)}px;transform-origin:${(c.ax*s).toFixed(1)}px 50%`;
+    sprites.add({el,getAnim,vl:true,c,s,phase:rnd()*10,f:-1,added:false});
+    return el;
+  }
   function makeGoose(r,getAnim){
     const root=document.createElement("div"); root.className="goose";
-    root.innerHTML=`<span class="crown">👑</span><span class="bubble"></span><span class="badge"></span><span class="gname"></span>`;
-    const bd=root.querySelector(".badge"); bd.style.background=r.color||"#333"; bd.textContent=r.num||"";
+    // càng ít phần tử con càng nhẹ khi đông: vương miện chỉ có 1 cái (chuyển sang con dẫn đầu), huy hiệu số chỉ tạo khi bật "Hiện số"
+    root.innerHTML=`<span class="bubble"></span><span class="gname"></span>`;
+    let bd=null;
+    if(showNum&&r.num){bd=document.createElement("span"); bd.className="badge"; bd.style.background=r.color||"#333"; bd.textContent=r.num; root.insertBefore(bd,root.firstChild);}
     root.querySelector(".gname").textContent=r.name||"";
     const sp=makeSprite(getAnim,r.sp,r.tint);
     root.insertBefore(sp.el,bd);
@@ -729,7 +767,9 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     const gr=r.el.getBoundingClientRect(), right=gr.left+gr.width*.88+b.offsetWidth, edge=box.getBoundingClientRect().right-4;
     if(right>edge) b.classList.add("left"); else if(right<edge-20) b.classList.remove("left");
   }
-  function tickBubble(r,dt){ if(r.bubbleT>0){r.bubbleT-=dt; if(r.bubbleT<=0) r.bubble.classList.remove("on"); else sideBubble(r);} }
+  function tickBubble(r,dt){ // xét lật bong bóng mỗi 0,25 giây thay vì mỗi khung (đọc vị trí tốn kém)
+    if(r.bubbleT>0){r.bubbleT-=dt; if(r.bubbleT<=0) r.bubble.classList.remove("on"); else if((r.sideT=(r.sideT||0)-dt)<=0){r.sideT=.25; sideBubble(r);}}
+  }
 
   /* ---------- Sound ---------- */
   let muted=false, actx=null;
@@ -798,22 +838,17 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
   const momName=()=>herd==="mix"?"Ngỗng mẹ":`${Noun()} mẹ`;
   const prizeName=()=>($("prize").value.trim()||"Battle Pass");
   // Vũ khí mode Sinh tồn (để ở đây vì màn chuẩn bị hiện bảng vũ khí ngay lúc mở trang)
-  const WEAPONS=[
-    {id:"dagger",ic:"🗡️",name:"Dao găm",min:7,max:13,cd:.65},
-    {id:"sword",ic:"⚔️",name:"Kiếm",min:11,max:19,cd:1},
-    {id:"axe",ic:"🪓",name:"Rìu",min:15,max:27,cd:1.4},
-    {id:"hammer",ic:"🔨",name:"Búa tạ",min:6,max:36,cd:1.4},
-    {id:"pan",ic:"🍳",name:"Chảo",min:9,max:15,cd:.8},
-    {id:"bone",ic:"🦴",name:"Xương",min:8,max:16,cd:.8},
-    {id:"bow",ic:"🏹",name:"Cung",min:5,max:11,cd:.9,ranged:true,shot:"➶"},
-    {id:"wand",ic:"🪄",name:"Đũa phép",min:4,max:17,cd:1.1,ranged:true,shot:"✨"}
+  const WEAPONS=[ // môn phái (đều cận chiến): sát thương min–max, hồi đòn (giây); id trùng tên nhân vật trong VL
+    {id:"dao",name:"Đao khách",min:8,max:14,cd:.66},
+    {id:"kiem",name:"Kiếm khách",min:11,max:20,cd:1},
+    {id:"daidao",name:"Đại đao",min:13,max:23,cd:1.4}
   ];
   const CRIT=.1, DODGE=.07;
-  const weaponHint=()=>"Vũ khí: "+WEAPONS.map(w=>`${w.ic} ${w.name} ${w.min}–${w.max}${w.ranged?" (xa)":""}`).join(" · ")+`. Chí mạng ${Math.round(CRIT*100)}% gấp đôi, né ${Math.round(DODGE*100)}%.`;
+  const weaponHint=()=>"Môn phái: "+WEAPONS.map(w=>`${w.name} ${w.min}–${w.max}${w.cd<.8?" (nhanh)":w.cd>1.2?" (chậm)":""}`).join(" · ")+`. Chí mạng ${Math.round(CRIT*100)}% gấp đôi, né ${Math.round(DODGE*100)}%.`;
   const MODE_INFO={
     give:{h:()=>`Con ${noun()} nào về nhất, người đó thắng.`,lede:()=>`Mỗi người một con ${noun()}, chạy hoàn toàn ngẫu nhiên trên đường đua dài. Camera bám theo con dẫn đầu cho tới vạch đích.`,go:()=>"Xuất phát",max:40,dur:"Độ dài đường đua"},
     team:{h:()=>`Thả ${noun()}, tự chia đội.`,lede:()=>"Cả đàn xuất phát cùng lúc và tự chạy vào chuồng. Các đội luôn đều nhau, và bạn có thể bắt vài con dính nhau hoặc cấm chung chuồng.",go:()=>`Thả ${noun()}`,max:40},
-    survive:{h:()=>"Có vũ khí, chém nhau tới con cuối cùng.",lede:()=>`Mỗi con ${noun()} một thanh máu, được phát ngẫu nhiên một món vũ khí có sát thương tối thiểu–tối đa riêng. Cả đàn lao vào chém nhau, hết máu là văng khỏi sân. Cuối trận bo thu hẹp, ở ngoài bo bị mất máu. Con trụ lại cuối cùng là người thắng.`,go:()=>"Thả vào sân",max:40,dur:"Thời lượng trận"},
+    survive:{h:()=>"Phát vũ khí, chém nhau tới người cuối cùng.",lede:()=>"Mỗi người một chiến binh pixel với một món vũ khí ngẫu nhiên, mỗi món có sát thương tối thiểu–tối đa riêng. Cả sân lao vào chém nhau, hết máu là văng khỏi sân. Cuối trận bo thu hẹp, ở ngoài bo bị mất máu. Ai trụ lại cuối cùng là người thắng.",go:()=>"Vào đấu trường",max:40,dur:"Thời lượng trận"},
     egg:{h:()=>"Trứng ai nở trước, người đó trúng.",lede:()=>`Mỗi người một quả trứng. ${momName()} đi ấp lòng vòng, trứng rung rồi nứt dần. Quả nào nở ra con non đầu tiên là thắng.`,go:()=>"Bắt đầu ấp",max:40,dur:"Thời gian ấp"},
     pass:{h:()=>`Con ${noun()} dừng trước ai, người đó ẵm ${prizeName()}.`,lede:()=>`Cả nhóm xếp vòng quanh ${prizeName()}. Nhấn giữ lệnh bài lấy đà rồi thả, con ${noun()} chạy vòng vòng, chậm dần rồi dừng trước một người. Người đó mang giải về.`,go:()=>`Tranh ${prizeName()}`,max:40},
     cup:{h:()=>"Chia bảng đấu, kéo thả người thắng.",lede:()=>"Tạo bảng nhánh thắng/thua, loại trực tiếp hoặc vòng tròn. Kéo thẻ một đội vào ô Thắng hoặc Thua, đội đó tự đi tiếp đúng nhánh.",go:()=>"Tạo bảng đấu",max:64}
@@ -859,7 +894,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
   }
   function updateCount(){
     const items=parse(), max=MODE_INFO[mode].max, w=$("listWarn"), p=listProblem(items);
-    const unit=mode!=="cup"?`con ${noun()}`:cupBuild==="preset"?"đội":"người";
+    const unit=mode==="survive"?"chiến binh":mode!=="cup"?`con ${noun()}`:cupBuild==="preset"?"đội":"người";
     $("count").textContent=(items.length>max?`${items.length}/${max} ${unit}`:`${items.length} ${unit}`)
       +(mode==="cup"&&cupBuild==="random"&&items.length>1?` → ${cupTeamCount(items.length)} đội`:"");
     w.textContent=p; w.hidden=!p;
@@ -939,15 +974,15 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     $("durWrap").hidden=!info.dur; if(info.dur) $("durLabel").textContent=info.dur;
     $("teamOpts").hidden=mode!=="team";
     $("payOpts").hidden=mode!=="pass";
-    $("numWrap").hidden=mode==="pass"||mode==="cup";
-    $("herdWrap").hidden=$("colorWrap").hidden=mode==="cup";
+    $("numWrap").hidden=mode==="pass"||mode==="cup"||mode==="survive";
+    $("herdWrap").hidden=$("colorWrap").hidden=mode==="cup"||mode==="survive";
     $("cupOpts").hidden=mode!=="cup";
     $("survHint").hidden=mode!=="survive"; if(mode==="survive") $("survHint").textContent=weaponHint();
     document.querySelectorAll("[data-cupfmt]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.cupfmt===cupFmt)));
     document.querySelectorAll("[data-cupbuild]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.cupbuild===cupBuild)));
     document.querySelectorAll("[data-cupsize]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.cupsize===cupSize)));
     cupArmed=false;
-    $("listHint").textContent=`Từ 2 đến ${info.max} tên. Danh sách được giữ lại cho lần sau. Sprite thú: Duckhive (CC0).`;
+    $("listHint").textContent=`Từ 2 đến ${info.max} tên. Danh sách được giữ lại cho lần sau. `+(mode==="survive"?"Nhân vật: LuizMelo – Martial Hero 1–3 (CC0).":"Sprite thú: Duckhive (CC0).");
     $("err").textContent="";
     applyText(); updateCount(); refreshSelects(); if(mode==="pass") lastWinInfo(); if(mode==="cup") cupSetupInfo();
   }
@@ -1066,7 +1101,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
   function addHistory(e){const h=loadHistory();h.unshift({t:Date.now(),...e});store.set(HIST_KEY,JSON.stringify(h.slice(0,HIST_MAX)));}
   const fmtTime=t=>{const d=new Date(t),p=x=>String(x).padStart(2,"0");return `${p(d.getHours())}:${p(d.getMinutes())} ${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()}`;};
   const herdWord=h=>h==="mix"?"thú":(NOUN[h]||"thú");
-  const histMeta=e=>`${fmtTime(e.t)} · ${MODE_LABEL[e.mode]||e.mode} · ${e.n} ${e.mode==="cup"?"đội":"con "+herdWord(e.herd)}`;
+  const histMeta=e=>`${fmtTime(e.t)} · ${MODE_LABEL[e.mode]||e.mode} · ${e.n} ${e.mode==="cup"?"đội":e.mode==="survive"?"chiến binh":"con "+herdWord(e.herd)}`;
   function histLine(e){
     const head=histMeta(e);
     if(e.mode==="team") return head+"\n"+e.teams.map(g=>`${g.ic} ${g.name}: ${g.members.join(", ")}`).join("\n");
@@ -1112,7 +1147,8 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     RES=cfg;
     const tint=colorful&&cfg.tint!==false?cfg.color:null;
     const wg=$("winGoose"); wg.innerHTML=""; wg.className="g"+(cfg.baby&&!tint&&(cfg.sp||"goose")==="goose"?" baby":"");
-    wg.appendChild(makeSprite(()=>cfg.anim||"cheer",cfg.sp,tint).el);
+    if(cfg.hero) wg.appendChild(fighterSprite(cfg.hero,100,()=>({a:"idle",t0:0})));
+    else wg.appendChild(makeSprite(()=>cfg.anim||"cheer",cfg.sp,tint).el);
     if(cfg.num){const bd=document.createElement("span");bd.className="badge";bd.style.background=cfg.color;bd.textContent=cfg.num;wg.appendChild(bd);}
     $("winLabel").textContent=cfg.label; $("winName").textContent=cfg.name;
     addHistory({mode,herd,n:cfg.n||(cfg.order?cfg.order.length:0),winner:cfg.name,prize:mode==="pass"?prizeName():"",top:(cfg.order||[]).slice(1,3).map(r=>r.name)});
@@ -1145,7 +1181,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     // chừa khoảng trên cho con to (thỏ, cánh cụt) khỏi bị cắt đầu, và cộng thêm viền 3px mỗi cạnh
     const padT=Math.round(lh*.35), H=padT+n*lh, border=6;
     wrap.style.height=(H+border)+"px";
-    world.style.width=worldW+"px"; world.style.height=H+"px"; world.style.transform="translateX(0)";
+    world.style.width=worldW+"px"; world.style.height=H+"px"; world.style.transform=""; wrap.scrollLeft=0;
     const top0=document.createElement("div"); top0.className="lane a"; top0.style.top="0px"; top0.style.height=padT+"px"; world.appendChild(top0);
     racers.forEach((r,i)=>{const d=document.createElement("div");d.className="lane "+(i%2?"b":"a");d.style.top=(padT+i*lh)+"px";d.style.height=lh+"px";world.appendChild(d);});
     const sl=document.createElement("div"); sl.className="startline"; sl.style.left=START+"px"; world.appendChild(sl);
@@ -1154,7 +1190,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     const fin=document.createElement("div"); fin.className="finish"; fin.style.left=END+"px"; world.appendChild(fin);
     const decos=["🌼","🌿","🌸","🍀"];
     for(let k=0;k<Math.round(worldW/45);k++){const d=document.createElement("span");d.className="deco";d.textContent=decos[k%4];d.style.left=between(0,worldW)+"px";d.style.top=between(0,H-14)+"px";world.appendChild(d);}
-    G={my,racers,W,START,TRACK,worldW,gw,cam:0,running:false,winner:null,finishedAt:0,finished:[],leaderName:"",t:0};
+    G={my,racers,W,wrap,START,TRACK,worldW,gw,cam:0,running:false,winner:null,finishedAt:0,finished:[],leaderName:"",t:0};
     racers.forEach((r,i)=>{
       Object.assign(r,{p:0,base:between(.96,1.04)/dur,mult:1,target:1,retarget:0,state:"run",stateT:0,bubbleT:0,done:false});
       const g=makeGoose(r,()=>(!G.running||r.done||r.state==="stall")?"idle":r.state==="sprint"?"flap":"run");
@@ -1195,11 +1231,15 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
       placeGive(r);
     }
     let leader=G.racers[0]; for(const r of G.racers) if(r.p>leader.p) leader=r;
-    G.racers.forEach(r=>r.el.classList.toggle("lead",!G.winner&&r===leader));
+    // một vương miện duy nhất, chuyển sang con đang dẫn đầu (thay vì mỗi con một cái rồi bật/tắt)
+    if(!G.crown){G.crown=document.createElement("span"); G.crown.className="crown"; G.crown.textContent="👑";}
+    if(G.winner){ if(G.crown.isConnected) G.crown.remove(); }
+    else if(G.crownOn!==leader){ leader.el.appendChild(G.crown); G.crownOn=leader; }
     if(!G.winner&&leader.name!==G.leaderName){G.leaderName=leader.name;$("status").textContent=`Dẫn đầu: ${leader.name}`;if(G.t>2&&rnd()<.5)say(leader,line(leader,"lead"));}
     const target=clamp(G.START+leader.p*G.TRACK-G.W*.62,0,G.worldW-G.W);
     G.cam+=(target-G.cam)*Math.min(1,dt*4);
-    $("world").style.transform=`translateX(${-G.cam}px)`;
+    // camera: cuộn khung nhìn thay vì dời cả đường đua (dời bằng transform bắt tính lại style mọi thứ bên trong mỗi khung hình)
+    G.wrap.scrollLeft=G.cam;
     if(G.winner&&G.t-G.finishedAt>1.6){
       G.running=false;
       const order=G.finished.concat(G.racers.filter(r=>!G.finished.includes(r)).sort((a,b)=>b.p-a.p)), w=order[0];
@@ -1412,36 +1452,45 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     $("outList").innerHTML=""; $("outTitle").hidden=true;
     const n=racers.length, W=host.clientWidth, H=Math.round(clamp(window.innerHeight-260,380,560));
     host.style.height=H+"px";
-    const gh=gooseSize(n), gw=gh*1.25;
+    // gh: chiều cao người lúc đứng; hw: bề ngang khung neo; gw: khoảng cách giữa các con (tầm đánh tính theo gw)
+    const gh=Math.round(clamp(gooseSize(n)*1.5,44,72)), hw=Math.round(gh*.5), gw=gh*.8;
+    new Image().src=VL_SRC;
     // sát thương giữ đúng min–max của vũ khí; lượng máu chỉnh theo số con và thời lượng để trận dài ngắn đúng lựa chọn
     const hpMax=Math.round(clamp(100*(.85*dur)/Math.min(4+1.5*n,17),40,400));
     const zone=document.createElement("div"); zone.className="zone"; host.appendChild(zone);
-    A={my,racers,W,H,gw,gh,hpMax,alive:n,t:0,order:[],running:false,done:false,shots:[],hearts:[],heartT:between(3,5),
+    A={my,racers,W,H,gw,gh,hw,hpMax,alive:n,t:0,order:[],running:false,done:false,hearts:[],heartT:between(3,5),
        zone,zx:W/2,zy:H/2,zR0:Math.hypot(W,H)/2+gw,zR:Math.hypot(W,H)/2+gw,zMin:gw*1.6,feedT:0,blipT:0};
     const cols=Math.ceil(Math.sqrt(n*W/H)), rows=Math.ceil(n/cols);
     const pool=shuffle(WEAPONS), wpns=shuffle(racers.map((r,i)=>pool[i%pool.length])); // ít con thì bốc ngẫu nhiên vài món, đông thì chia đều rồi xáo
-    shuffle(racers).forEach((r,k)=>{
-      const cx=(k%cols+.5)*W/cols+between(-8,8), cy=(Math.floor(k/cols)+.5)*(H-gh-20)/rows+gh+10+between(-6,6);
+    shuffle(racers).forEach((r,q)=>{ // q: thứ tự đặt chỗ
+      const cx=(q%cols+.5)*W/cols+between(-8,8), cy=(Math.floor(q/cols)+.5)*(H-gh-20)/rows+gh+10+between(-6,6);
       Object.assign(r,{x:clamp(cx,gw/2,W-gw/2),y:clamp(cy,gh+4,H-10),h:between(-Math.PI,Math.PI),
-        base:between(.95,1.05)*gw*1.7,state:"run",bubbleT:0,out:false,hp:hpMax,wpn:wpns[k],cool:between(.3,1.2),
-        tgt:null,retT:0,kills:0,hurtT:0,jx:between(-1,1),jy:between(-1,1)});
-      makeGoose(r,()=>!A.running?"idle":r.out?"flap":r.state==="atk"?"flap":r.state==="idle"?"idle":"walk");
-      r.el.style.width=gw+"px"; r.el.style.height=gh+"px";
-      const hp=document.createElement("span"); hp.className="hpb"; hp.innerHTML="<i></i>"; r.el.appendChild(hp); r.hpEl=hp.firstChild;
-      const wp=document.createElement("span"); wp.className="wpn"; wp.innerHTML="<i></i>"; wp.firstChild.textContent=r.wpn.ic;
-      wp.style.fontSize=Math.round(gh*.5)+"px"; r.el.appendChild(wp); r.wpnEl=wp;
+        base:between(.95,1.05)*gw*1.7,state:"run",bubbleT:0,out:false,hp:hpMax,wpn:wpns[q],cool:between(.3,1.2),
+        tgt:null,retT:0,kills:0,hurtT:0,atkT:0,pend:null,anim:{a:"idle",t0:0},jx:between(-1,1),jy:between(-1,1)});
+      r.sp="hero"; // thoại chung, không dùng câu riêng của thú
+      const root=document.createElement("div"); root.className="goose warrior";
+      root.innerHTML=`<span class="foot"></span><span class="bubble"></span><span class="gname"></span>`;
+      root.querySelector(".foot").style.background=r.color; root.querySelector(".gname").textContent=r.name;
+      const fs=fighterSprite(r.wpn.id,gh,()=>r.anim);
+      root.appendChild(fs); root.style.width=hw+"px"; root.style.height=gh+"px";
+      r.el=root; r.spr=fs; r.bubble=root.querySelector(".bubble");
+      const hp=document.createElement("span"); hp.className="hpb"; hp.innerHTML="<i></i>"; root.appendChild(hp); r.hpEl=hp.firstChild;
       host.appendChild(r.el); placeArena(r);
     });
     placeZone();
-    $("status3").textContent=`${n} con vào sân, vũ khí đã phát. Chuẩn bị…`;
-    countdown(host,my,()=>{A.running=true;$("status3").textContent=`Còn ${A.alive} con`;shuffle(racers).slice(0,Math.min(3,racers.length)).forEach(r=>say(r,line(r,"start")));loop(my,tickSurvive);});
+    $("status3").textContent=`${n} hiệp khách vào sân. Chuẩn bị…`;
+    countdown(host,my,()=>{A.running=true;$("status3").textContent=`Còn ${A.alive} người`;shuffle(racers).slice(0,Math.min(3,racers.length)).forEach(r=>say(r,line(r,"start")));loop(my,tickSurvive);});
   }
   function placeArena(r){
-    r.el.style.transform=`translate(${r.x-A.gw/2}px,${r.y-A.gh}px)`;
+    r.el.style.transform=`translate(${r.x-A.hw/2}px,${r.y-A.gh}px)`;
     const left=Math.cos(r.h)<0;
     r.spr.style.transform=left?"scaleX(-1)":"";
     r.el.classList.toggle("fl",left);
   }
+  // động tác: đứng/chạy đổi khi khác; chiêu, trúng đòn, ngã thì chạy lại từ đầu
+  const animLen=(r,a)=>{const c=VL.chars.find(x=>x.id===r.wpn.id); return c.anims[a].n/VL_FPS[a];};
+  function play(r,a){ if(r.anim.a!==a) r.anim={a,t0:performance.now()}; }
+  function playOnce(r,a){ r.anim={a,t0:performance.now()}; }
   function placeZone(){
     const z=A.zone, R=A.zR;
     z.style.cssText=`left:${A.zx-R}px;top:${A.zy-R}px;width:${2*R}px;height:${2*R}px`;
@@ -1457,7 +1506,8 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     r.hpEl.style.background=p>.55?"#6AB04C":p>.25?"#F2C230":"#E4572E";
   }
   function hurt(v,dmg,by,crit){
-    v.hp-=dmg; setHp(v); v.hurtT=.18; v.el.classList.add("hurt");
+    v.hp-=dmg; setHp(v); v.el.classList.add("hurt"); v.flashT=.12;
+    if(v.atkT<=0&&v.hp>0){v.hurtT=animLen(v,"hit"); playOnce(v,"hit");} // đang ra chiêu thì không bị khựng
     if(by&&!by.out&&v.tgt!==by&&rnd()<.6){v.tgt=by; v.retT=between(1.5,3);} // bị đánh thì hay quay sang đánh lại kẻ đó
     floatText(v.x,v.y-A.gh*1.05,(crit?"💥 ":"")+"-"+dmg,crit?"crit":"");
     if(A.blipT<=0){blip();A.blipT=.08;}
@@ -1486,7 +1536,7 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     const zp=clamp((A.t-dur*.4)/(dur*.45),0,1), zEnd=clamp((A.t-dur*.85)/(dur*.15),0,1), late=A.t>dur?2:1;
     A.zR=(A.zR0+(A.zMin-A.zR0)*zp)*(1-zEnd); placeZone();
     const alive=shuffle(A.racers.filter(r=>!r.out)); // thứ tự xử lý ngẫu nhiên mỗi khung hình
-    if(A.feedT<=0&&!A.done) $("status3").textContent=zp>0&&zp<1?`Còn ${A.alive} con · ⚠️ Bo đang thu hẹp`:`Còn ${A.alive} con`;
+    if(A.feedT<=0&&!A.done) $("status3").textContent=zp>0&&zp<1?`Còn ${A.alive} người · ⚠️ Bo đang thu hẹp`:`Còn ${A.alive} người`;
     // máu rơi
     A.heartT-=dt;
     if(A.heartT<=0&&A.hearts.length<3&&!A.done){
@@ -1499,9 +1549,18 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     for(const r of alive){
       if(r.out) continue;
       tickBubble(r,dt); r.cool-=dt; r.retT-=dt;
-      if(r.hurtT>0){r.hurtT-=dt; if(r.hurtT<=0) r.el.classList.remove("hurt");}
+      if(r.flashT>0){r.flashT-=dt; if(r.flashT<=0) r.el.classList.remove("hurt");}
+      if(r.hurtT>0) r.hurtT-=dt;
+      if(r.pend){ // đòn ra đúng lúc vung tay: trúng nếu đối thủ còn trong tầm (nới rộng chút vì đối thủ có thể lùi)
+        r.pend.t-=dt;
+        if(r.pend.t<=0){
+          const v=r.pend.v; r.pend=null;
+          if(!v.out&&Math.hypot(v.x-r.x,v.y-r.y)<=A.gw*1.05*1.5) strike(r,v);
+          if(A.done) break;
+        }
+      }
       if(!r.tgt||r.tgt.out||r.retT<=0){r.tgt=pickTarget(r,alive);r.retT=between(1.5,3);}
-      const w=r.wpn, range=w.ranged?A.gw*2.8:A.gw*.95;
+      const w=r.wpn, range=A.gw*1.05;
       let gx=r.x, gy=r.y, want=0;
       // ngoài bo thì chạy vào trong trước
       const dz=Math.hypot(r.x-A.zx,r.y-A.zy), outside=dz>A.zR-A.gw*.3;
@@ -1512,35 +1571,24 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
       else if(r.tgt){
         const t=r.tgt, d=Math.hypot(t.x-r.x,t.y-r.y);
         if(d>range*.9){gx=t.x+r.jx*A.gw*.3;gy=t.y+r.jy*A.gw*.3;want=1;}
-        if(d<=range&&r.cool<=0){
-          r.cool=w.cd*between(.9,1.1); r.state="atk"; r.atkT=.25;
+        if(d<=range&&r.cool<=0&&!r.pend){
+          // ra chiêu: chọn ngẫu nhiên 1 trong 2 chiêu, đòn trúng ở giữa động tác
+          const a=rnd()<.5?"a1":"a2", len=animLen(r,a);
+          r.cool=w.cd*between(.9,1.1); r.state="atk"; r.atkT=len; r.hurtT=0; playOnce(r,a);
           r.h=Math.atan2(t.y-r.y,t.x-r.x);
-          const i=r.wpnEl.firstChild; i.classList.remove("swing"); void i.offsetWidth; i.classList.add("swing");
-          if(w.ranged){
-            const s=document.createElement("span"); s.className="shot"; s.textContent=w.shot; $("arena").appendChild(s);
-            A.shots.push({a:r,v:t,x:r.x,y:r.y-A.gh*.5,el:s});
-          } else strike(r,t);
+          r.pend={t:len*.45,v:t};
           if(rnd()<.06) say(r,line(r,"attack"));
-          if(A.done) break;
         }
       }
       if(r.atkT>0){r.atkT-=dt; if(r.atkT<=0) r.state="run";}
       if(want>0){
         const ang=Math.atan2(gy-r.y,gx-r.x); r.h+=angDiff(r.h,ang)*Math.min(1,dt*8);
-        const v=r.base*want*(r.state==="atk"?.4:1);
+        const v=r.base*want*(r.state==="atk"?.25:r.hurtT>0?.5:1);
         r.x+=Math.cos(r.h)*v*dt; r.y+=Math.sin(r.h)*v*dt;
         if(r.state!=="atk") r.state="run";
       } else if(r.state!=="atk") r.state="idle";
+      if(r.atkT<=0&&r.hurtT<=0) play(r,r.state==="run"?"run":"idle");
     }
-    // đạn bay (bám theo mục tiêu)
-    A.shots=A.shots.filter(s=>{
-      const tx=s.v.x, ty=s.v.y-A.gh*.5, d=Math.hypot(tx-s.x,ty-s.y), sp=A.gw*9*dt;
-      if(s.v.out||A.done){s.el.remove();return false;}
-      if(d<=sp){s.el.remove(); strike(s.a,s.v); return false;}
-      s.x+=(tx-s.x)/d*sp; s.y+=(ty-s.y)/d*sp;
-      s.el.style.transform=`translate(${s.x}px,${s.y}px) rotate(${Math.atan2(ty-s.y,tx-s.x)}rad)`;
-      return true;
-    });
     // ngoài bo bị trừ máu (càng về cuối càng đau)
     if(zp>0) for(const r of shuffle(A.racers.filter(x=>!x.out))){
       if(A.done) break;
@@ -1562,17 +1610,16 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
 
     if(A.alive===1&&!A.done){
       A.done=true;
-      A.shots.forEach(s=>s.el.remove()); A.shots=[];
-      const w=A.racers.find(r=>!r.out); w.state="idle"; say(w,line(w,"win"),3);
-      $("status3").textContent=`🏆 ${w.name} trụ lại cuối cùng! ${w.wpn.ic} ${w.kills} hạ gục`;
+      const w=A.racers.find(r=>!r.out); w.state="idle"; w.atkT=0; w.hurtT=0; w.pend=null; play(w,"idle"); say(w,line(w,"win"),3);
+      $("status3").textContent=`🏆 ${w.name} trụ lại cuối cùng! ${w.wpn.name}, ${w.kills} hạ gục`;
       honk(1.25);honk(1.25,.28);
       setTimeout(()=>{
         if(A.my===session){
           const order=[w].concat(A.order.slice().reverse());
-          showResult({label:`🏆 Sống sót cuối cùng · ${w.wpn.ic} ${w.wpn.name} · ${w.kills} hạ gục`,name:w.name,sp:w.sp,color:w.color,num:showNum?w.num:0,order,
-            note:r=>`${r.wpn.ic} ${r.kills} hạ gục`,again:"Chơi lại",
+          showResult({label:`🏆 Sống sót cuối cùng · ${w.wpn.name} · ${w.kills} hạ gục`,name:w.name,hero:w.wpn.id,color:w.color,num:showNum?w.num:0,order,
+            note:r=>`${r.wpn.name} · ${r.kills} hạ gục`,again:"Chơi lại",
             removeText:order.length>2?`Loại "${w.name}", chơi tiếp`:null,
-            copy:`🏆 Sống sót: ${w.name} (${w.wpn.ic} ${w.wpn.name}, ${w.kills} hạ gục)\n\nThứ tự:\n`+order.map((r,i)=>`${i+1}. ${r.name} · ${r.wpn.ic} ${r.wpn.name} · ${r.kills} hạ gục`).join("\n")});
+            copy:`🏆 Sống sót: ${w.name} (${w.wpn.name}, ${w.kills} hạ gục)\n\nThứ tự:\n`+order.map((r,i)=>`${i+1}. ${r.name} · ${r.wpn.name} · ${r.kills} hạ gục`).join("\n")});
         }
       },1800);
       return false;
@@ -1581,15 +1628,14 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
   function knock(v,by){
     v.out=true; A.alive--; A.order.push(v); v.killedBy=by;
     if(by) by.kills++;
-    const from=by||{x:A.zx,y:A.zy};
-    const ang=Math.atan2(v.y-from.y,v.x-from.x)+between(-.3,.3), far=Math.max(A.W,A.H);
-    say(v,line(v,"hit"),1.2);
-    v.el.classList.remove("hurt"); v.el.classList.add("out");
-    v.el.style.transform=`translate(${v.x+Math.cos(ang)*far*.6-A.gw/2}px,${v.y+Math.sin(ang)*far*.6-A.gh}px) rotate(${between(360,720)}deg)`;
+    v.pend=null; v.atkT=0; say(v,line(v,"hit"),1.2);
+    if(by) v.h=Math.atan2(by.y-v.y,by.x-v.x); placeArena(v); // ngã quay mặt về phía kẻ hạ mình
+    v.el.classList.remove("hurt"); v.el.classList.add("dead"); playOnce(v,"death");
+    const my=A.my; setTimeout(()=>{if(my===session) v.el.classList.add("gone");},animLen(v,"death")*1000+700);
     honk(1.5,0,.2);
     $("outTitle").hidden=false;
     const chip=document.createElement("span"); chip.textContent=v.name; chip.title=by?`bị ${by.name} hạ (${by.wpn.name})`:"chết ngoài bo"; $("outList").prepend(chip);
-    $("status3").textContent=by?`${by.wpn.ic} ${by.name} hạ gục ${v.name}!`:`☠️ ${v.name} gục ngoài bo!`;
+    $("status3").textContent=by?`⚔️ ${by.name} hạ gục ${v.name} bằng ${by.wpn.name}!`:`☠️ ${v.name} gục ngoài bo!`;
     A.feedT=1.4;
     if(A.alive===2){const f=A.racers.filter(r=>!r.out);$("status3").textContent+=` ⚔️ Chung kết: ${f[0].name} và ${f[1].name}`; A.feedT=2.5;}
   }

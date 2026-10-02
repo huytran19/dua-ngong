@@ -15,8 +15,8 @@ Game bốc thăm/giveaway chạy trên trình duyệt, dùng cho guild. Toàn b�
 Thứ tự nút trên màn chuẩn bị: Đua Ngỗng, Vòng quay may mắn, Chia team, Sinh tồn, Trứng nở, Giải đấu. Mã mode trong code vẫn giữ tên cũ (`give`, `pass`).
 - **give** (hiển thị: "Đua Ngỗng"): đua ngang, camera bám con dẫn đầu, 3 độ dài 15/30/50s.
 - **team**: 2/3/4 đội đều sĩ số; cặp "dính" (union-find) và "không chung chuồng"; giải bằng quay lui có trọng số trong `solveTeams`. Tốc độ Nhanh/Vừa/Lề mề có giờ tối đa 15/30/60s (gần hết giờ thì hết lưỡng lự, chạm mốc thì lùa thẳng vào chuồng).
-- **survive**: đánh nhau bằng vũ khí. Mỗi con một thanh máu (lượng máu `hpMax` chỉnh theo số con và thời lượng; sát thương giữ đúng min–max ghi trên vũ khí). 8 vũ khí trong `WEAPONS` (khai báo cạnh `MODE_INFO` vì màn chuẩn bị hiện bảng vũ khí): 6 cận chiến, 2 đánh xa bắn đạn bám mục tiêu. Chí mạng 10% x2, né 7%. Bị đánh thì 60% quay sang đánh lại kẻ đó. Tim ❤️ rơi hồi 25% máu. Bo thu từ 40% thời lượng, hết giờ thu về 0 và ngoài bo mất máu gấp đôi, nên trận xong trong khoảng thời lượng đã chọn. Kết quả ghi số hạ gục và vũ khí.
-  - Công bằng: vị trí, vũ khí (chia đều rồi xáo, ít con thì bốc ngẫu nhiên vài món), mục tiêu và thứ tự xử lý mỗi khung hình đều ngẫu nhiên, nên trước trận ai cũng như nhau. Đã cân vũ khí bằng mô phỏng tua nhanh (thay `requestAnimationFrame`/`setTimeout`/`performance.now` bằng đồng hồ giả trong Playwright): 160 trận 8 con, mỗi món thắng 13–24 (kỳ vọng 20), mỗi người 15–26. Sửa chỉ số vũ khí thì nên mô phỏng lại.
+- **survive**: đấu trường kiếm hiệp, chỉ cận chiến. Mỗi người bốc ngẫu nhiên 1 trong 3 môn phái trong `WEAPONS` (khai báo cạnh `MODE_INFO` vì màn chuẩn bị hiện bảng môn phái): Đao khách (nhanh), Kiếm khách (cân bằng), Đại đao (chậm mà đau). Mỗi môn một nhân vật có 2 chiêu; đòn trúng ở giữa động tác (`r.pend`) nếu đối thủ còn trong tầm. Thanh máu (`hpMax` chỉnh theo số người và thời lượng; sát thương giữ đúng min–max). Chí mạng 10% x2, né 7%. Bị đánh thì khựng (hoạt ảnh trúng đòn), 60% quay sang đánh lại. Tim ❤️ hồi 25% máu. Bo thu từ 40% thời lượng, hết giờ thu về 0 và ngoài bo mất máu gấp đôi. Hết máu thì ngã tại chỗ rồi mờ dần. Đã thử và bỏ: đánh xa (phi thương, pháp sư) vì người dùng thấy xấu.
+  - Công bằng: vị trí, môn phái (chia đều rồi xáo), mục tiêu và thứ tự xử lý mỗi khung hình đều ngẫu nhiên, nên trước trận ai cũng như nhau. Cân môn phái bằng mô phỏng tua nhanh (thay `requestAnimationFrame`/`setTimeout`/`performance.now` bằng đồng hồ giả trong Playwright, hẹn giờ phải chạy cùng nhịp đồng hồ giả): ván 10 người các môn thắng 56/48/48 trên 152 trận. Sửa chỉ số thì nên mô phỏng lại ở cỡ 4, 10, 20 người.
 - **egg**: trứng nứt dần, mẹ ấp quả nào thì quả đó ấm hơn.
 - **pass** (hiển thị: "Vòng quay may mắn", trước đây là "Tranh Pass"): nhấn giữ lệnh bài lấy đà. Người thắng **bốc lúc thả tay**; lực chỉ quyết định số vòng (nhẹ 7–9, mạnh nhất 15–17). Dưới 15 người: ghế quanh sân; 15–40 người: vòng chia lát. Tên giải tuỳ chỉnh (mặc định "Battle Pass"), có tuỳ chọn né người vừa thắng.
 
@@ -44,10 +44,18 @@ Thứ tự nút trên màn chuẩn bị: Đua Ngỗng, Vòng quay may mắn, Chi
 - Giao diện sáng: logo nhạt trên nền sáng nên đặt trên nền tròn tối.
 
 ## Sprite
+- Nhân vật Sinh tồn: LuizMelo – Martial Hero 1, 2, 3 (CC0) ghép thành `sprites/vo-lam.png` (file riêng, chỉ tải khi vào Sinh tồn). Mỗi nhân vật một khối 6 hàng: idle, run, a1, a2, hit, death; ô cắt sát hình. Toạ độ, điểm chân (`ax`, `ay`) và chiều cao người (`bodyH`) nằm trong hằng `VL`; `fighterSprite()` vẽ, vòng `paint()` chạy khung (đứng/chạy lặp, chiêu/trúng đòn/ngã chạy một lần).
 - Nguồn: Duckhive trên itch.io (ngỗng, thỏ, sóc: CC0; cánh cụt: tác giả cho dùng tự do). Đã bỏ bò và ếch vì giống asset của game khác.
 - Sheet 264x432, mỗi ô 40x32 với viền trống 2px (bước 44x36) để chống lem pixel khi phóng to. Mọi con đã lật cho quay mặt sang phải.
 - Hàng: 0–3 ngỗng (idle, walk, run, flap), 4–5 thỏ, 6–7 sóc, 8–11 cánh cụt (idle, walk, flap, roll). Bảng ánh xạ ở `ANIMS`; `flap` = bứt tốc, `cheer` = ăn mừng.
 - Tô màu: `tintedSheet(hex)` thay đúng các màu gốc trong `TINT_RULES` (thân/lông), giữ viền, mỏ, chân.
+
+## Hiệu năng (đông con là giật nếu sai mấy điều này)
+- Trong `paint()` đọc kích thước (`clientHeight`) của mọi con trước rồi mới ghi style, và chỉ đo lại mỗi ~1 giây. Đọc xen kẽ với ghi bắt trình duyệt tính lại bố cục cho từng con.
+- Camera Đua Ngỗng dùng `scrollLeft` của khung đua, không dời `#world` bằng transform (dời cha bắt tính lại style cả trăm phần tử trang trí bên trong mỗi khung hình).
+- Ít phần tử con mỗi con thú: một vương miện duy nhất chuyển sang con dẫn đầu, huy hiệu số chỉ tạo khi bật "Hiện số".
+- Ảnh sprite (kể cả bản tô màu) dùng đường dẫn `blob:` ngắn, không gắn data URL dài vào từng phần tử. Bong bóng chỉ xét lật mỗi 0,25 giây.
+- Đo bằng Playwright + `Emulation.setCPUThrottlingRate` 4 lần, đọc FPS và trace `UpdateLayoutTree` (số phần tử, thời gian mỗi lần). Sau khi sửa: Đua Ngỗng 40 con ~1,7 ms/lần tính style (trước 7,8 ms).
 
 ## Quy ước
 - Giao diện và thoại bằng tiếng Việt. Tiêu đề trên thanh trên và tab luôn là "Lunar Capital Tool" (cỡ chữ co theo màn hình để không bị cắt ở 360px). Lời dẫn và nút vẫn đổi theo đàn (ngỗng/thỏ/sóc/cánh cụt/thú).
