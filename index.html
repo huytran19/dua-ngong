@@ -245,6 +245,8 @@ textarea.flash{animation:taflash .5s ease-out}
 @keyframes taflash{from{border-color:var(--accent)}to{border-color:var(--line)}}
 
 .top-btns{display:flex;gap:8px}
+.top-left{display:flex;align-items:center;gap:10px;min-width:0}
+#backBtn{font-size:22px;font-weight:700;line-height:1}
 .hist-title{margin:0;font-family:"Baloo 2",sans-serif;font-weight:800;font-size:30px}
 .hist{display:flex;flex-direction:column;gap:8px}
 .hist-item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
@@ -259,7 +261,8 @@ textarea.flash{animation:taflash .5s ease-out}
 <body>
 <main class="app">
   <div class="top">
-    <div class="logo"><span id="logoGoose"></span><span id="appTitle">Đua Ngỗng</span></div>
+    <div class="top-left"><button class="icon-btn" id="backBtn" aria-label="Quay lại" hidden>←</button>
+      <div class="logo"><span id="logoGoose"></span><span id="appTitle">Đua Ngỗng</span></div></div>
     <div class="top-btns"><button class="icon-btn" id="histBtn" aria-label="Lịch sử các ván">📜</button><button class="icon-btn" id="mute" aria-label="Tắt tiếng">🔊</button></div>
   </div>
 
@@ -424,7 +427,12 @@ textarea.flash{animation:taflash .5s ease-out}
   const angDiff=(a,b)=>{let d=b-a;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d;};
   const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
   let session=0; // mỗi lần chạy một ván mới hoặc quay về, ván cũ tự dừng
-  const show=s=>{Object.values(scr).forEach(x=>x.hidden=(x!==s));window.scrollTo(0,0);};
+  // Rời màn chuẩn bị thì đẩy một mốc vào lịch sử trình duyệt, để nút back của điện thoại quay về thay vì thoát trang
+  const show=s=>{
+    Object.values(scr).forEach(x=>x.hidden=(x!==s));window.scrollTo(0,0);
+    $("backBtn").hidden=s===scr.setup;
+    if(s!==scr.setup&&!(history.state&&history.state.dn)) try{history.pushState({dn:1},"");}catch(e){}
+  };
   const gooseSize=n=>n<=8?48:n<=16?40:n<=28?32:27;
 
   /* ---------- Sprites ---------- */
@@ -750,8 +758,22 @@ textarea.flash{animation:taflash .5s ease-out}
   document.querySelectorAll("[data-herd]").forEach(b=>b.addEventListener("click",()=>{herd=b.dataset.herd;store.set("dua-ngong-herd",herd);setLogo();applyMode();}));
   setLogo(); applyMode();
 
-  function backToSetup(){session++;show(scr.setup);applyMode();}
+  let ignorePop=false;
+  function backToSetup(){
+    session++;show(scr.setup);applyMode();
+    if(history.state&&history.state.dn){ignorePop=true;history.back();} // gỡ mốc đã đẩy, để back lần nữa là thoát trang như thường
+  }
   document.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",backToSetup));
+  // Nút ← và nút back của trình duyệt: đang xem lịch sử từ màn kết quả thì về kết quả, còn lại dừng ván về màn chuẩn bị
+  const leave=()=>{ if(!scr.history.hidden&&histFrom===scr.result) show(scr.result); else backToSetup(); };
+  $("backBtn").addEventListener("click",leave);
+  window.addEventListener("popstate",()=>{
+    if(ignorePop){ // back do backToSetup gọi; lỡ vào ván mới trước khi back xong thì đẩy lại mốc
+      ignorePop=false; if(scr.setup.hidden) try{history.pushState({dn:1},"");}catch(e){}
+      return;
+    }
+    if(scr.setup.hidden) leave();
+  });
 
   function fail(msg){backToSetup();$("err").textContent=msg;}
   function go(){
@@ -872,7 +894,7 @@ textarea.flash{animation:taflash .5s ease-out}
     if(histFrom!==scr.setup&&histFrom!==scr.result){session++;histFrom=scr.setup;} // đang chạy dở thì dừng ván
     renderHistory(); show(scr.history);
   });
-  $("histBack").addEventListener("click",()=>{ if(histFrom===scr.result) show(scr.result); else backToSetup(); });
+  $("histBack").addEventListener("click",leave);
   $("histCopy").addEventListener("click",e=>copyText(loadHistory().map(histLine).join("\n\n"),e.currentTarget));
   $("histClear").addEventListener("click",()=>{
     if(!clearArmed){clearArmed=true;$("histClear").textContent="Bấm lần nữa để xoá hết";return;}
