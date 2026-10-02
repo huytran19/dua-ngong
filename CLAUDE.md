@@ -45,6 +45,9 @@ Game bốc thăm/giveaway chạy trên trình duyệt, dùng cho guild. Toàn b�
 ## Deploy
 - Repo public `huytran19/dua-ngong`, GitHub Pages từ branch `main`, thư mục root: https://huytran19.github.io/dua-ngong/
 - Push lên `main` là Pages tự build lại (khoảng 1 phút).
+- Link riêng từng mode: `/giveaway/`, `/chia-team/`, `/sinh-ton/`, `/trung-no/`, `/tranh-pass/`. Mỗi thư mục chỉ có một `index.html` nhỏ chứa thẻ Open Graph (thẻ xem trước khi dán vào Discord) rồi chuyển về `../?mode=<mode>`. Game đọc `?mode=` lúc mở và cập nhật lại URL khi đổi mode.
+- Ảnh xem trước 1200x630 ở `og/` (`home.jpg` cho trang chính, `<mode>.jpg` cho từng link). Tạo bằng Playwright: chụp khu vực chơi giữa ván rồi ghép với tiêu đề. Đổi giao diện nhiều thì chụp lại.
+- Discord lưu thẻ xem trước khá lâu, sửa ảnh xong có thể phải chờ hoặc thêm `?v=2` vào link.
 
 ## Việc tiếp theo đã bàn
 - Nút gửi kết quả lên Discord qua Webhook (URL webhook chỉ lưu localStorage trên máy host, không ghi vào code). Chỉ chạy được trên bản GitHub Pages.

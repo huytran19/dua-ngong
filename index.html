@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Đua Ngỗng</title>
+<meta name="description" content="Game bốc thăm cho guild: Giveaway, Chia team, Sinh tồn, Trứng nở, Tranh Pass. Mở là chơi, không cần cài.">
+<meta property="og:title" content="Đua Thú: bốc thăm cho guild">
+<meta property="og:description" content="Giveaway, Chia team, Sinh tồn, Trứng nở, Tranh Pass. Dán danh sách tên, bấm một nút là có kết quả.">
+<meta property="og:image" content="https://huytran19.github.io/dua-ngong/og/home.jpg">
+<meta property="og:url" content="https://huytran19.github.io/dua-ngong/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#8CC152">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
@@ -629,6 +636,10 @@ textarea.flash{animation:taflash .5s ease-out}
     pass:{h:()=>`Con ${noun()} dừng trước ai, người đó ẵm ${prizeName()}.`,lede:()=>`Cả nhóm xếp vòng quanh ${prizeName()}. Nhấn giữ lệnh bài lấy đà rồi thả, con ${noun()} chạy vòng vòng, chậm dần rồi dừng trước một người. Người đó mang giải về.`,go:()=>`Tranh ${prizeName()}`,max:40}
   };
   let mode=store.get("dua-ngong-mode","give"); if(mode==="pay") mode="pass"; if(!MODE_INFO[mode]) mode="give";
+  // Link riêng từng mode: ?mode=give|team|survive|egg|pass (các thư mục /giveaway/, /chia-team/... chuyển về đây)
+  const urlMode=new URLSearchParams(location.search).get("mode");
+  if(MODE_INFO[urlMode]){mode=urlMode;store.set("dua-ngong-mode",mode);}
+  const syncUrl=()=>{try{history.replaceState(history.state,"",`?mode=${mode}`);}catch(e){}};
   let dur=parseInt(store.get("dua-ngong-dur","30"),10)||30, spd=store.get("dua-ngong-spd","mid");
   let teamK=parseInt(store.get("dua-ngong-k","2"),10)||2;
   let showNum=store.get("dua-ngong-num","0")==="1";
@@ -750,7 +761,7 @@ textarea.flash{animation:taflash .5s ease-out}
   }
   document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>{
     const next=b.dataset.mode; if(next===mode) return;
-    mode=next; store.set("dua-ngong-mode",mode); applyMode();
+    mode=next; store.set("dua-ngong-mode",mode); syncUrl(); applyMode();
   }));
   document.querySelectorAll("[data-dur]").forEach(b=>b.addEventListener("click",()=>{dur=+b.dataset.dur;store.set("dua-ngong-dur",String(dur));applyMode();}));
   document.querySelectorAll("[data-spd]").forEach(b=>b.addEventListener("click",()=>{spd=b.dataset.spd;store.set("dua-ngong-spd",spd);applyMode();}));
