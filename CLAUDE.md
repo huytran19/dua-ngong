@@ -12,6 +12,7 @@ Game bốc thăm/giveaway chạy trên trình duyệt, dùng cho guild. Toàn b�
   - **Mode: Đua Ngỗng (give)**, **Chia team**, **Sinh tồn**, **Trứng nở**, **Vòng quay may mắn (pass)** (`startRing`), **Giải đấu (cup)** ở cuối file.
 
 ## 6 mode
+**Đang tạm khoá: Sinh tồn, Trứng nở, Giải đấu** (người dùng chưa ưng). Khoá bằng `LOCKED` trong `index.html` (ngay trên dòng khởi tạo `mode`): ẩn nút, `?mode=` và mode đã lưu tự quay về Đua Ngỗng, ẩn nút "Tạo bảng đấu" ở Chia team. Code vẫn giữ nguyên. Link ngắn `/sinh-ton/`, `/trung-no/`, `/giai-dau/` đang chuyển về trang chính với thẻ xem trước chung. Mở lại mode nào thì xoá khỏi `LOCKED`, dựng lại trang link ngắn của mode đó và chạy lại phần tạo ảnh xem trước.
 Thứ tự nút trên màn chuẩn bị: Đua Ngỗng, Vòng quay may mắn, Chia team, Sinh tồn, Trứng nở, Giải đấu. Mã mode trong code vẫn giữ tên cũ (`give`, `pass`).
 - **give** (hiển thị: "Đua Ngỗng"): đua ngang, camera bám con dẫn đầu, 3 độ dài 15/30/50s.
 - **team**: 2/3/4 đội đều sĩ số; cặp "dính" (union-find) và "không chung chuồng"; giải bằng quay lui có trọng số trong `solveTeams`. Tốc độ Nhanh/Vừa/Lề mề có giờ tối đa 15/30/60s (gần hết giờ thì hết lưỡng lự, chạm mốc thì lùa thẳng vào chuồng).

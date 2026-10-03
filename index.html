@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lunar Capital Tool</title>
-<meta name="description" content="Tool của Lunar Capital: Đua Ngỗng, Vòng quay may mắn, Chia team, Sinh tồn, Trứng nở và chia bảng Giải đấu. Mở là chơi, không cần cài.">
+<meta name="description" content="Tool của Lunar Capital: Đua Ngỗng, Vòng quay may mắn, Chia team. Mở là chơi, không cần cài.">
 <meta property="og:title" content="Lunar Capital Tool: bốc thăm cho guild">
-<meta property="og:description" content="Đua Ngỗng, Vòng quay may mắn, Chia team, Sinh tồn, Trứng nở, Giải đấu nhánh thắng/thua. Dán danh sách tên, bấm một nút là có kết quả.">
+<meta property="og:description" content="Đua Ngỗng, Vòng quay may mắn, Chia team. Dán danh sách tên, bấm một nút là có kết quả.">
 <meta property="og:image" content="https://huytran19.github.io/dua-ngong/og/home.jpg">
 <meta property="og:url" content="https://huytran19.github.io/dua-ngong/">
 <meta name="twitter:card" content="summary_large_image">
@@ -853,10 +853,15 @@ button.tcard:hover{background:rgba(242,154,46,.14)}
     pass:{h:()=>`Con ${noun()} dừng trước ai, người đó ẵm ${prizeName()}.`,lede:()=>`Cả nhóm xếp vòng quanh ${prizeName()}. Nhấn giữ lệnh bài lấy đà rồi thả, con ${noun()} chạy vòng vòng, chậm dần rồi dừng trước một người. Người đó mang giải về.`,go:()=>`Tranh ${prizeName()}`,max:40},
     cup:{h:()=>"Chia bảng đấu, kéo thả người thắng.",lede:()=>"Tạo bảng nhánh thắng/thua, loại trực tiếp hoặc vòng tròn. Kéo thẻ một đội vào ô Thắng hoặc Thua, đội đó tự đi tiếp đúng nhánh.",go:()=>"Tạo bảng đấu",max:64}
   };
-  let mode=store.get("dua-ngong-mode","give"); if(mode==="pay") mode="pass"; if(!MODE_INFO[mode]) mode="give";
+  // Mode đang tạm khoá: không hiện nút, không vào được qua link hay lựa chọn đã lưu. Mở lại thì xoá khỏi danh sách này.
+  const LOCKED=new Set(["survive","egg","cup"]);
+  const usable=m=>!!MODE_INFO[m]&&!LOCKED.has(m);
+  document.querySelectorAll("[data-mode]").forEach(b=>{if(LOCKED.has(b.dataset.mode)) b.hidden=true;});
+  if(LOCKED.has("cup")) $("teamToCup").hidden=true;
+  let mode=store.get("dua-ngong-mode","give"); if(mode==="pay") mode="pass"; if(!usable(mode)) mode="give";
   // Link riêng từng mode: ?mode=give|team|survive|egg|pass (các thư mục /giveaway/, /chia-team/... chuyển về đây)
   const urlMode=new URLSearchParams(location.search).get("mode");
-  if(MODE_INFO[urlMode]){mode=urlMode;store.set("dua-ngong-mode",mode);}
+  if(usable(urlMode)){mode=urlMode;store.set("dua-ngong-mode",mode);}
   const syncUrl=()=>{try{history.replaceState(history.state,"",`?mode=${mode}`);}catch(e){}};
   let dur=parseInt(store.get("dua-ngong-dur","30"),10)||30, spd=store.get("dua-ngong-spd","mid");
   let teamK=parseInt(store.get("dua-ngong-k","2"),10)||2;
